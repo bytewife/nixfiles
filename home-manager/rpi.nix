@@ -5,6 +5,7 @@
     home.packages = with pkgs; [
 	git
         nixfmt
+	tmux
     ];
     programs.git = {
 	enable = true;
