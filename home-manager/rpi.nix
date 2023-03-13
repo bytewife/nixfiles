@@ -5,7 +5,6 @@
     home.packages = with pkgs; [
 	git
         nixfmt
-	tmux
     ];
     programs.git = {
 	enable = true;
@@ -13,8 +12,10 @@
 	userEmail = "ivyemberraine@gmail.com";
 	# package = pkgs.gitFull;	
 	extraConfig = {
-	  credential.credentialStore = "libsecret";
-	};
+      	  credential.helper = "${
+            pkgs.git.override { withLibsecret = true; }
+          }/bin/git-credential-libsecret";
+    	};
     };
     programs.home-manager.enable = true;
 }
