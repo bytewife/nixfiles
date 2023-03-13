@@ -11,6 +11,10 @@
 	enable = true;
 	userName = "Ivy Raine";
 	userEmail = "ivyemberraine@gmail.com";
+	# package = pkgs.gitFull;	
+	extraConfig = {
+	  credential.credentialStore = "libsecret";
+	};
     };
     programs.home-manager.enable = true;
 }
