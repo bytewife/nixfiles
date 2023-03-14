@@ -137,6 +137,7 @@ with lib;
 	environment.systemPackages = 
 	    with pkgs; 
 	    [
+		pkgs.gitAndTools.gitFull
 		neovim
 	    ]; 
 
