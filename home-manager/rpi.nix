@@ -16,7 +16,9 @@
       	  # credential.helper = "${
           #   pkgs.git.override { withLibsecret = true; }
           # }/bin/git-credential-libsecret";
-	  # credential.helper = "${pkgs.gitAndTools.gitFull}/bin/git-credential-libsecret";
+	  credential.helper = "${pkgs.gitAndTools.gitFull}/bin/git-credential-libsecret";
+	  github.user = "ivyraine";
+	  init.defaultBranch = "main";
     	};
     };
     programs.home-manager.enable = true;
