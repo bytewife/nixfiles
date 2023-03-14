@@ -22,5 +22,6 @@
     	};
     };
     services.gnome-keyring.enable = true;
+    services.gnome-keyring.components = [ "secrets" ];
     programs.home-manager.enable = true;
 }
