@@ -1,4 +1,6 @@
-{pkgs, ...}: {
+{pkgs, ...}: 
+let home = builtins.getEnv "HOME";
+in {
     home.username = "ivy";
     home.homeDirectory = "/home/ivy";
     home.stateVersion = "22.11"; # To figure this out you can comment out the line and see what version it expected.
@@ -6,6 +8,13 @@
 	# git
         nixfmt
     ];
+    programs.password-store = {
+      enable = true;
+      package = pkgs.pass.withExtensions (exts: [ exts.pass-otp exts.pass-genphrase ]);
+      settings = {
+        PASSWORD_STORE_DIR = "${home}/doc/.passwords";
+      };
+    };
     programs.git = {
 	package = pkgs.gitFull;
 	enable = true;
