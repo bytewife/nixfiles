@@ -148,17 +148,13 @@ with lib;
       [
         stdenv
         stdenvNoCC # for runCommand
-        busybox
-        jq # for closureInfo
-	git
+        # busybox
         # For boot.initrd.systemd
         makeInitrdNGTool
-	neovim
-	lsof
         systemdStage1
         systemdStage1Network
       ];
-    system.stateVersion = "23.05";
+    system.stateVersion = "22.11";
 
     networking.firewall.enable = false;
   };
