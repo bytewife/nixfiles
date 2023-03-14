@@ -21,5 +21,6 @@
 	  init.defaultBranch = "main";
     	};
     };
+    services.gnome-keyring.enable = true;
     programs.home-manager.enable = true;
 }
