@@ -27,7 +27,8 @@ in {
           # }/bin/git-credential-libsecret";
 	  # credential.helper = "${pkgs.gitAndTools.gitFull}/bin/git-credential-libsecret";
 	  # credential.helper = "libsecret";
-	  credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
+	  #redential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
+	  credential.helper = "store --file ~/.git-credentials";
 	  github.user = "ivyraine";
 	  rerere.enabled = true;
 	  init.defaultBranch = "main";
