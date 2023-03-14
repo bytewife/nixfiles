@@ -17,12 +17,14 @@
           #   pkgs.git.override { withLibsecret = true; }
           # }/bin/git-credential-libsecret";
 	  # credential.helper = "${pkgs.gitAndTools.gitFull}/bin/git-credential-libsecret";
-	  credential.helper = "libsecret";
+	  # credential.helper = "libsecret";
+	  credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
 	  github.user = "ivyraine";
+	  rerere.enabled = true;
 	  init.defaultBranch = "main";
     	};
     };
     services.gnome-keyring.enable = true;
-    services.gnome-keyring.components = [ "secrets" ];
+    services.gnome-keyring.components = [ "secrets" "pkcs11" "ssh" ];
     programs.home-manager.enable = true;
 }
