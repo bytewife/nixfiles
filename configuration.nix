@@ -59,6 +59,7 @@ with lib;
 
     # Automatically log in at the virtual consoles.
     services.getty.autologinUser = "ivy";
+    services.gnome3.gnome-keyring.enable = true;
 
     # Some more help text.
     services.getty.helpLine = ''
