@@ -59,6 +59,10 @@ with lib;
 
     # Automatically log in at the virtual consoles.
     services.getty.autologinUser = "ivy";
+
+    services.xserver.enable = true;
+    services.xserver.displayManager.gdm.enable = true;
+    services.xserver.desktopManager.gnome.enable = true;
     services.gnome3.gnome-keyring.enable = true;
 
     # Some more help text.
