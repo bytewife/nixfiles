@@ -25,6 +25,13 @@ with lib;
 
  config = {
 
+    virtualisation = {
+      libvirtd = {
+        enable = true;
+      };
+    };
+
+
     nix = {
 	package = pkgs.nixFlakes;
 	extraOptions = ''
@@ -43,7 +50,7 @@ with lib;
     # Use less privileged ivy user
     users.users.ivy = {
       isNormalUser = true;
-      extraGroups = [ "wheel" "networkmanager" "video" ];
+      extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
     };
@@ -140,6 +147,7 @@ with lib;
 	    with pkgs; 
 	    [
 		pkgs.gitAndTools.gitFull
+		tmux
 		neovim
 	    ]; 
 
