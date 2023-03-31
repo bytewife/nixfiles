@@ -29,12 +29,79 @@ in {
   home.stateVersion =
     "22.11"; # To figure this out you can comment out the line and see what version it expected.
   home.packages = with pkgs; [
-    # git
+    chromium
     tmux
     ripgrep
     gitui
     nixfmt
   ];
+  programs.neovim = {
+    plugins = with pkgs.vimPlugins; [
+      vim-surround
+    ];
+    enable = true;
+      extraConfig = ''
+        nnoremap a j
+        vnoremap a j
+        noremap e k
+        vnoremap e k
+        nnoremap i h
+        vnoremap i h
+        noremap o l
+        vnoremap o l
+        noremap j ;
+        noremap r i
+        noremap , o
+        noremap l e
+        noremap L E
+        noremap H B
+        noremap h b
+        noremap n a
+        noremap N A
+        noremap t w
+        noremap T W
+        noremap w ^
+        noremap ; $
+        noremap m ge
+        noremap M gE
+        noremap b t
+        noremap R I
+        noremap B T
+        noremap x .
+        noremap j n
+        noremap < O
+        noremap Y y$n
+        noremap D d$
+        noremap C c$
+        noremap Q @
+        noremap = .
+        noremap <C-j> J
+        noremap J N
+        noremap P ^
+        noremap <BS> x
+        noremap k <C-D>
+        noremap . <C-U>
+        noremap <tab> >>
+        noremap <S-tab> <<
+        vnoremap <tab> > >gv
+        vnoremap <S-tab> < <gv
+        inoremap <C-p> <Esc>0i<CR>
+        noremap <M-w> 0
+        noremap <M-;> $
+        inoremap <M-w> 0i
+        inoremap <M-;> $a
+        map <M-f> $
+        noremap <M-b> u
+        noremap + .
+        noremap = %
+        noremap _ >
+        noremap - <
+        noremap <C--> <C-x>
+        noremap <C-=> <C-a>
+        noremap <M-,> <C-o>
+        noremap <C-M-,> <C-i>
+      '';
+  };
   programs.password-store = {
     enable = true;
     package =
