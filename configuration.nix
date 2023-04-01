@@ -4,11 +4,19 @@
 with lib;
 
 let
-  keymap = pkgs.writeText "keymap.xkb" ''
-        xkb_keymap {
+  rnst_keycodes = pkgs.writeText "rnst_keycodes" ''
           xkb_keycodes  { include "evdev+aliases(qwerty)"  };
+  '';
+  rnst_types = pkgs.writeText "rnst_types" ''
           xkb_types     { include "complete"	};
+  '';
+  rnst_compat = pkgs.writeText "rnst_compat" ''
           xkb_compat    { include "complete"	};
+  '';
+  rnst_geometry = pkgs.writeText "rnst_geometry" ''
+          xkb_geometry  { include "pc(pc105)"	};
+  '';
+  rnst_symbols = pkgs.writeText "rnst_symbols" ''
           xkb_symbols   {
             include "pc+us(dvp)+inet(evdev)"
 
@@ -71,8 +79,6 @@ let
 	    key <PRSC> { [ BackSpace, BackSpace, BackSpace, BackSpace ] };
 
           };
-          xkb_geometry  { include "pc(pc105)"	};
-        };
   '';
 
 in {
@@ -132,19 +138,36 @@ in {
     # Enable the X11 windowing system.
     services.xserver = {
       enable = true;
-      layout = "us";
+
+      # https://discourse.nixos.org/t/unable-to-set-custom-xkb-layout/16534
+      extraLayouts.rnst = {
+        description = "Ivy's keyboard";
+        languages = [ "eng" ];
+	typesFile = rnst_types;
+        symbolsFile = rnst_symbols;
+        keycodesFile = rnst_keycodes;
+	geometryFile = rnst_geometry;
+	compatFile = rnst_compat;
+      };
+      layout = "rnst";
+
       # videoDrivers = [ "nvidia" ];
-      windowManager.i3.enable = true;
+      # windowManager.i3 = {
+      	# enable = true;
+	# configFile = ./i3-config;
+	# extraPackages = with pkgs; [
+          # dmenu #application launcher most people use
+          # i3status # gives you the default i3 status bar
+          # i3lock #default i3 screen locker
+          # i3blocks #if you are planning on using i3blocks over i3status
+        # ];        
+      # };
       displayManager.lightdm.enable = true;
 
       # keyboard stuff
       autoRepeatDelay = 200;
       autoRepeatInterval = 25;
-      displayManager.sessionCommands = ''
-        ${pkgs.xorg.xkbcomp}/bin/xkbcomp ${keymap} $DISPLAY
-      '';
     };
-    environment.etc."X11/keymap.xkb".source = keymap;
 
     # Some more help text.
     services.getty.helpLine = ''

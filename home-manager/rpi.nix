@@ -1,29 +1,50 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
   home = builtins.getEnv "HOME";
   mod = "Mod4";
 in {
-# services.xserver = {
-#   enable = true;
-#
-#   desktopManager = {
-#     xterm.enable = false;
-#   };
-#  
-#   displayManager = {
-#       defaultSession = "none+i3";
-#   };
-#
-#   windowManager.i3 = {
-#     enable = true;
-#     extraPackages = with pkgs; [
-#       dmenu #application launcher most people use
-#       i3status # gives you the default i3 status bar
-#       i3lock #default i3 screen locker
-#       i3blocks #if you are planning on using i3blocks over i3status
-#    ];
-#   };
-# };
+  # Requires dm, which, in my config, is enabled in configuration.nix
+  xsession.windowManager.i3 = {
+    enable = true;
+    config = {
+      modifier = mod;
+
+      # fonts = ["DejaVu Sans Mono, FontAwesome 6"];
+
+      keybindings = lib.mkOptionDefault {
+        "${mod}+p" = "exec ${pkgs.dmenu}/bin/dmenu_run";
+        # "${mod}+x" = "exec sh -c '${pkgs.maim}/bin/maim -s | xclip -selection clipboard -t image/png'";
+        # "${mod}+Shift+x" = "exec sh -c '${pkgs.i3lock}/bin/i3lock -c 222222 & sleep 5 && xset dpms force of'";
+
+        # Focus
+        "${mod}+i" = "focus left";
+        "${mod}+a" = "focus down";
+        "${mod}+e" = "focus up";
+        "${mod}+o" = "focus right";
+
+        # Move
+        "${mod}+Shift+i" = "move left";
+        "${mod}+Shift+a" = "move down";
+        "${mod}+Shift+e" = "move up";
+        "${mod}+Shift+o" = "move right";
+
+	# Layouts
+        "${mod}+l" = "layout toggle split";
+
+        # My multi monitor setup
+        # "${mod}+m" = "move workspace to output DP-2";
+        # "${mod}+Shift+m" = "move workspace to output DP-5";
+      };
+
+      # bars = [
+      #   {
+      #     position = "bottom";
+      #     statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${./i3status-rust.toml}";
+      #   }
+      # ];
+    };
+  };
+
   home.username = "ivy";
   home.homeDirectory = "/home/ivy";
   home.stateVersion =
