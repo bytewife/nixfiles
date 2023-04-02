@@ -237,7 +237,7 @@ in {
     programs.zsh.autosuggestions.enable = true;
     programs.zsh.syntaxHighlighting.enable = true;
     programs.zsh.ohMyZsh.enable = true;
-    programs.zsh.ohMyZsh.plugins = [ "git" ];
+    programs.zsh.ohMyZsh.plugins = [ "autojump" "git" ];
     programs.zsh.ohMyZsh.theme = "robbyrussell";
 
     # Tell the Nix evaluator to garbage collect more aggressively.
@@ -260,6 +260,10 @@ in {
       TERMINAL = "alacritty";
     };
     environment.etc."i3config".text = (import ./pkgs/i3config.nix { inherit pkgs; });
+    
+    fonts.fonts = with pkgs; [
+      (nerdfonts.override { fonts = [ "Hack" ]; })
+    ];
 
     # Make the installer more likely to succeed in low memory
     # environments.  The kernel's overcommit heustistics bite us
