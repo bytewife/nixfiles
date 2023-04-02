@@ -4,65 +4,10 @@ let
   mod = "Mod4";
 in {
   # Requires dm, which, in my config, is enabled in configuration.nix
-  xsession.windowManager.i3 = {
-    enable = false;
-    config = {
-      modifier = mod;
-
-      # fonts = ["DejaVu Sans Mono, FontAwesome 6"];
-
-      keybindings = lib.mkOptionDefault {
-        "${mod}+p" = "exec ${pkgs.dmenu}/bin/dmenu_run";
-        # "${mod}+x" = "exec sh -c '${pkgs.maim}/bin/maim -s | xclip -selection clipboard -t image/png'";
-        # "${mod}+Shift+x" = "exec sh -c '${pkgs.i3lock}/bin/i3lock -c 222222 & sleep 5 && xset dpms force of'";
-
-        # Focus
-        "${mod}+i" = "focus left";
-        "${mod}+a" = "focus down";
-        "${mod}+e" = "focus up";
-        "${mod}+o" = "focus right";
-
-        # Move
-        "${mod}+Shift+i" = "move left";
-        "${mod}+Shift+a" = "move down";
-        "${mod}+Shift+e" = "move up";
-        "${mod}+Shift+o" = "move right";
-
-        # Etc
-        "${mod}+Shift+c" = "kill";
-
-        # Layouts
-        "${mod}+l" = "layout toggle split";
-
-        # My multi monitor setup
-        # "${mod}+m" = "move workspace to output DP-2";
-        # "${mod}+Shift+m" = "move workspace to output DP-5";
-      };
-
-      # bars = [
-      #   {
-      #     position = "bottom";
-      #     statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${./i3status-rust.toml}";
-      #   }
-      # ];
-    };
-  };
-
   home.username = "ivy";
   home.homeDirectory = "/home/ivy";
-  #home.sessionVariables = {
-  #  EDITOR = "nvim";
-  #  BROWSER = "chromium";
-  #  TERMINAL = "alacritty";
-  #};
-  #programs.bash.enable = true;
-  #programs.bash.initExtra = ''
-  #  export TERMINAL="alacritty";
-  #  export EDITOR="nvim";
-  #  export BROWSER="chromium";
-  #'';
-  home.stateVersion = "22.11";
   home.packages = with pkgs; [ chromium tmux ripgrep gitui nixfmt ];
+  home.stateVersion = "22.11";
 
   home.file.".config/alacritty/alacritty.yml".source = ./.config/alacritty/alacritty.yml;
 
@@ -70,14 +15,6 @@ in {
   programs.zoxide.enableZshIntegration = true;
 
   programs = {
-    #zsh = {
-    #  enable = true;
-    #  oh-my-zsh = {
-    #    enable = true;
-    #    plugins = [ "autojump" "bgnotify" "git" "sudo" "zsh-autosuggestions" ];
-    #    theme = "robbyrussell";
-    #  };
-    #};
     neovim = {
       plugins = with pkgs.vimPlugins; [ vim-surround ];
       enable = true;

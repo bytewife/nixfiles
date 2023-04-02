@@ -19,14 +19,19 @@
   outputs = { self, nixpkgs, home-manager, ... }: {
     # nixosConfigurations is the key that nixos-rebuild looks for.
     nixosConfigurations = {
-      nixos = nixpkgs.lib.nixosSystem {
+      lap = nixpkgs.lib.nixosSystem {
         # A lot of times online you will see the use of flake-utils + a
         # function which iterates over many possible systems. My system
         # is x86_64-linux, so I'm only going to define that
-        system = "aarch64-linux";
-        # Import our old system configuration.nix
+        system = "x86_64-linux";
         modules = [
-          ./configuration.nix
+          ./configurations/lap.nix
+        ];
+      };
+      rpi = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          ./configurations/rpi.nix
         ];
       };
     };
@@ -40,7 +45,7 @@
         pkgs = nixpkgs.legacyPackages.aarch64-linux;
 
         modules = [ 
-	  ./home-manager/rpi.nix
+	  ./home-manager/ivy.nix
 	];
       };
     };

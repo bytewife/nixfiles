@@ -1,0 +1,7 @@
+{ modulesPath, ... }:
+{
+imports =
+    [
+      ./configuration.nix
+    ];
+}

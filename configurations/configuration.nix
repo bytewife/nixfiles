@@ -259,7 +259,7 @@ in {
       TERM = "alacritty";
       TERMINAL = "alacritty";
     };
-    environment.etc."i3config".text = (import ./pkgs/i3config.nix { inherit pkgs; });
+    environment.etc."i3config".text = (import ../pkgs/i3config.nix { inherit pkgs; });
     
     fonts.fonts = with pkgs; [
       (nerdfonts.override { fonts = [ "Hack" ]; })
