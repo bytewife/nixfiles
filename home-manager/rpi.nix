@@ -5,7 +5,7 @@ let
 in {
   # Requires dm, which, in my config, is enabled in configuration.nix
   xsession.windowManager.i3 = {
-    enable = true;
+    enable = false;
     config = {
       modifier = mod;
 
@@ -28,7 +28,10 @@ in {
         "${mod}+Shift+e" = "move up";
         "${mod}+Shift+o" = "move right";
 
-	# Layouts
+        # Etc
+        "${mod}+Shift+c" = "kill";
+
+        # Layouts
         "${mod}+l" = "layout toggle split";
 
         # My multi monitor setup
@@ -47,20 +50,37 @@ in {
 
   home.username = "ivy";
   home.homeDirectory = "/home/ivy";
-  home.stateVersion =
-    "22.11"; # To figure this out you can comment out the line and see what version it expected.
-  home.packages = with pkgs; [
-    chromium
-    tmux
-    ripgrep
-    gitui
-    nixfmt
-  ];
-  programs.neovim = {
-    plugins = with pkgs.vimPlugins; [
-      vim-surround
-    ];
-    enable = true;
+  #home.sessionVariables = {
+  #  EDITOR = "nvim";
+  #  BROWSER = "chromium";
+  #  TERMINAL = "alacritty";
+  #};
+  #programs.bash.enable = true;
+  #programs.bash.initExtra = ''
+  #  export TERMINAL="alacritty";
+  #  export EDITOR="nvim";
+  #  export BROWSER="chromium";
+  #'';
+  home.stateVersion = "22.11";
+  home.packages = with pkgs; [ chromium tmux ripgrep gitui nixfmt ];
+
+  home.file.".config/alacritty/alacritty.yml".source = ./.config/alacritty/alacritty.yml;
+
+  programs.zoxide.enable = true;
+  programs.zoxide.enableZshIntegration = true;
+
+  programs = {
+    #zsh = {
+    #  enable = true;
+    #  oh-my-zsh = {
+    #    enable = true;
+    #    plugins = [ "autojump" "bgnotify" "git" "sudo" "zsh-autosuggestions" ];
+    #    theme = "robbyrussell";
+    #  };
+    #};
+    neovim = {
+      plugins = with pkgs.vimPlugins; [ vim-surround ];
+      enable = true;
       extraConfig = ''
         nnoremap a j
         vnoremap a j
@@ -122,33 +142,35 @@ in {
         noremap <M-,> <C-o>
         noremap <C-M-,> <C-i>
       '';
-  };
-  programs.password-store = {
-    enable = true;
-    package =
-      pkgs.pass.withExtensions (exts: [ exts.pass-otp exts.pass-genphrase ]);
-    settings = { PASSWORD_STORE_DIR = "${home}/doc/.passwords"; };
-  };
-  programs.git = {
-    package = pkgs.gitFull;
-    enable = true;
-    userName = "Ivy Raine";
-    userEmail = "ivyemberraine@gmail.com";
-    # package = pkgs.gitFull;	
-    extraConfig = {
-      # credential.helper = "${
-      #   pkgs.git.override { withLibsecret = true; }
-      # }/bin/git-credential-libsecret";
-      # credential.helper = "${pkgs.gitAndTools.gitFull}/bin/git-credential-libsecret";
-      # credential.helper = "libsecret";
-      #redential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
-      credential.helper = "store --file ~/.git-credentials";
-      github.user = "ivyraine";
-      rerere.enabled = true;
-      init.defaultBranch = "main";
+    };
+    password-store = {
+      enable = true;
+      package =
+        pkgs.pass.withExtensions (exts: [ exts.pass-otp exts.pass-genphrase ]);
+      settings = { PASSWORD_STORE_DIR = "${home}/doc/.passwords"; };
+    };
+    git = {
+      package = pkgs.gitFull;
+      enable = true;
+      userName = "Ivy Raine";
+      userEmail = "ivyemberraine@gmail.com";
+      # package = pkgs.gitFull;	
+      extraConfig = {
+        # credential.helper = "${
+        #   pkgs.git.override { withLibsecret = true; }
+        # }/bin/git-credential-libsecret";
+        # credential.helper = "${pkgs.gitAndTools.gitFull}/bin/git-credential-libsecret";
+        # credential.helper = "libsecret";
+        #redential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
+        credential.helper = "store --file ~/.git-credentials";
+        github.user = "ivyraine";
+        rerere.enabled = true;
+        init.defaultBranch = "main";
+      };
     };
   };
   services.gnome-keyring.enable = true;
   services.gnome-keyring.components = [ "secrets" "pkcs11" "ssh" ];
   programs.home-manager.enable = true;
 }
+

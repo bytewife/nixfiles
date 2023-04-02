@@ -5,80 +5,79 @@ with lib;
 
 let
   rnst_keycodes = pkgs.writeText "rnst_keycodes" ''
-          xkb_keycodes  { include "evdev+aliases(qwerty)"  };
+    xkb_keycodes  { include "evdev+aliases(qwerty)"  };
   '';
   rnst_types = pkgs.writeText "rnst_types" ''
-          xkb_types     { include "complete"	};
+    xkb_types     { include "complete"	};
   '';
   rnst_compat = pkgs.writeText "rnst_compat" ''
-          xkb_compat    { include "complete"	};
+    xkb_compat    { include "complete"	};
   '';
   rnst_geometry = pkgs.writeText "rnst_geometry" ''
-          xkb_geometry  { include "pc(pc105)"	};
+    xkb_geometry  { include "pc(pc105)"	};
   '';
   rnst_symbols = pkgs.writeText "rnst_symbols" ''
-          xkb_symbols   {
-            include "pc+us(dvp)+inet(evdev)"
+    xkb_symbols   {
+      include "pc+us(dvp)+inet(evdev)"
 
-    	    key <TLDE> { [dead_grave, dead_tilde,         grave,       asciitilde ] };
-            key <AE01> { [         1,     exclam,    exclamdown,      onesuperior ] };
-            key <AE02> { [         2,         at,   twosuperior, dead_doubleacute ] };
-            key <AE03> { [         3, numbersign, threesuperior,      dead_macron ] };
-            key <AE04> { [         4,     dollar,      currency,         sterling ] };
-            key <AE05> { [         5,    percent,      EuroSign,     dead_cedilla ] };
-            key <AE06> { [    6, dead_circumflex,    onequarter,      asciicircum ] };
-            key <AE07> { [         7,  ampersand,       onehalf,        dead_horn ] };
-            key <AE08> { [         8,   asterisk, threequarters,      dead_ogonek ] };
-            key <AE09> { [         9,  parenleft, leftsinglequotemark, dead_breve ] };
-            key <AE10> { [         0, parenright, rightsinglequotemark, dead_abovering ] };
-            key <AE11> { [     minus, underscore,           yen,    dead_belowdot ] };
-            key <AE12> { [     equal,       plus,      multiply,         division ] };
+      key <TLDE> { [dead_grave, dead_tilde,         grave,       asciitilde ] };
+      key <AE01> { [         1,     exclam,    exclamdown,      onesuperior ] };
+      key <AE02> { [         2,         at,   twosuperior, dead_doubleacute ] };
+      key <AE03> { [         3, numbersign, threesuperior,      dead_macron ] };
+      key <AE04> { [         4,     dollar,      currency,         sterling ] };
+      key <AE05> { [         5,    percent,      EuroSign,     dead_cedilla ] };
+      key <AE06> { [    6, dead_circumflex,    onequarter,      asciicircum ] };
+      key <AE07> { [         7,  ampersand,       onehalf,        dead_horn ] };
+      key <AE08> { [         8,   asterisk, threequarters,      dead_ogonek ] };
+      key <AE09> { [         9,  parenleft, leftsinglequotemark, dead_breve ] };
+      key <AE10> { [         0, parenright, rightsinglequotemark, dead_abovering ] };
+      key <AE11> { [     minus, underscore,           yen,    dead_belowdot ] };
+      key <AE12> { [     equal,       plus,      multiply,         division ] };
 
-            key <AD01> { [         l,          L,    adiaeresis,       Adiaeresis ] };
-            key <AD02> { [         h,          H,         aring,            Aring ] };
-            key <AD03> { [         d,          D,        eacute,           Eacute ] };
-            key <AD04> { [         c,          C,    registered,       registered ] };
-            key <AD05> { [bracketleft, braceleft,         thorn,            THORN ] };
-            key <AD06> { [         z,          Z,    udiaeresis,       Udiaeresis ] };
-            key <AD07> { [bracketright,braceright,       uacute,           Uacute ] };
-            key <AD08> { [         w,          W,        iacute,           Iacute ] };
-            key <AD09> { [         v,          V,        oacute,           Oacute ] };
-            key <AD10> { [     comma,       less,    odiaeresis,       Odiaeresis ] };
-            key <AD11> { [ semicolon,      colon, guillemotleft, leftdoublequotemark ] };
-            key <AD12> { [     slash,   question, guillemotright, rightdoublequotemark ] };
+      key <AD01> { [         l,          L,    adiaeresis,       Adiaeresis ] };
+      key <AD02> { [         h,          H,         aring,            Aring ] };
+      key <AD03> { [         d,          D,        eacute,           Eacute ] };
+      key <AD04> { [         c,          C,    registered,       registered ] };
+      key <AD05> { [bracketleft, braceleft,         thorn,            THORN ] };
+      key <AD06> { [         z,          Z,    udiaeresis,       Udiaeresis ] };
+      key <AD07> { [bracketright,braceright,       uacute,           Uacute ] };
+      key <AD08> { [         w,          W,        iacute,           Iacute ] };
+      key <AD09> { [         v,          V,        oacute,           Oacute ] };
+      key <AD10> { [     comma,       less,    odiaeresis,       Odiaeresis ] };
+      key <AD11> { [ semicolon,      colon, guillemotleft, leftdoublequotemark ] };
+      key <AD12> { [     slash,   question, guillemotright, rightdoublequotemark ] };
 
-            key <AC01> { [         r,          R,        aacute,           Aacute ] };
-            key <AC02> { [         n,          n,        ssharp,          section ] };
-            key <AC03> { [         s,          S,           eth,              ETH ] };
-            key <AC04> { [         t,          T,             f,                F ] };
-            key <AC05> { [         p,          P,             g,                G ] };
-            key <AC06> { [         x,          X,             h,                H ] };
-            key <AC07> { [         u,          U,             j,                J ] };
-            key <AC08> { [         i,          I,            oe,               OE ] };
-            key <AC09> { [         a,          A,        oslash,         Ooblique ] };
-            key <AC10> { [         e,          E,     paragraph,           degree ] };
-            key <AC11> { [         o,          O,    apostrophe,         quotedbl ] };
+      key <AC01> { [         r,          R,        aacute,           Aacute ] };
+      key <AC02> { [         n,          N,        ssharp,          section ] };
+      key <AC03> { [         s,          S,           eth,              ETH ] };
+      key <AC04> { [         t,          T,             f,                F ] };
+      key <AC05> { [         p,          P,             g,                G ] };
+      key <AC06> { [         x,          X,             h,                H ] };
+      key <AC07> { [         u,          U,             j,                J ] };
+      key <AC08> { [         i,          I,            oe,               OE ] };
+      key <AC09> { [         a,          A,        oslash,         Ooblique ] };
+      key <AC10> { [         e,          E,     paragraph,           degree ] };
+      key <AC11> { [         o,          O,    apostrophe,         quotedbl ] };
 
-            key <AB01> { [         m,          m,            ae,               AE ] };
-            key <AB02> { [         b,          b,             x,                X ] };
-            key <AB03> { [         f,          f,     copyright,             cent ] };
-            key <AB04> { [         g,          g,             v,                V ] };
-            key <AB05> { [         j,          j,             b,                B ] };
-            key <AB06> { [         q,          q,        ntilde,           Ntilde ] };
-            key <AB07> { [apostrophe,   quotedbl,            mu,               mu ] };
-            key <AB08> { [         y,          Y,      ccedilla,         Ccedilla ] };
-            key <AB09> { [         k,          K, dead_abovedot,       dead_caron ] };
-            key <AB10> { [    period,    greater,  questiondown,        dead_hook ] };
+      key <AB01> { [         m,          M,            ae,               AE ] };
+      key <AB02> { [         b,          B,             x,                X ] };
+      key <AB03> { [         f,          F,     copyright,             cent ] };
+      key <AB04> { [         g,          G,             v,                V ] };
+      key <AB05> { [         j,          J,             b,                B ] };
+      key <AB06> { [         q,          Q,        ntilde,           Ntilde ] };
+      key <AB07> { [apostrophe,   quotedbl,            mu,               mu ] };
+      key <AB08> { [         y,          Y,      ccedilla,         Ccedilla ] };
+      key <AB09> { [         k,          K, dead_abovedot,       dead_caron ] };
+      key <AB10> { [    period,    greater,  questiondown,        dead_hook ] };
 
-            key <BKSL> { [ backslash,        bar,       notsign,        brokenbar ] };
+      key <BKSL> { [ backslash,        bar,       notsign,        brokenbar ] };
 
-            key <LSGT> { [ backslash,   bar,            backslash,      bar ] };
+      key <LSGT> { [ backslash,   bar,            backslash,      bar ] };
 
-	    key <CAPS> { [ Escape, Escape, Escape, Escape ] };
-	    key <ESC>  { [ Caps_Lock, Caps_Lock, Caps_Lock, Caps_Lock ] };
-	    key <PRSC> { [ BackSpace, BackSpace, BackSpace, BackSpace ] };
-
-          };
+      key <CAPS> { [ Escape, Escape, Escape, Escape ] };
+      key <ESC>  { [ Caps_Lock, Caps_Lock, Caps_Lock, Caps_Lock ] };
+      key <PRSC> { [ BackSpace, BackSpace, BackSpace, BackSpace ] };
+      };
   '';
 
 in {
@@ -143,26 +142,26 @@ in {
       extraLayouts.rnst = {
         description = "Ivy's keyboard";
         languages = [ "eng" ];
-	typesFile = rnst_types;
+        typesFile = rnst_types;
         symbolsFile = rnst_symbols;
         keycodesFile = rnst_keycodes;
-	geometryFile = rnst_geometry;
-	compatFile = rnst_compat;
+        geometryFile = rnst_geometry;
+        compatFile = rnst_compat;
       };
       layout = "rnst";
 
+      desktopManager = { xterm.enable = false; };
+
+      # Don't use desktop manager.
+      displayManager.defaultSession = "none+i3";
+
+      windowManager.i3 = {
+        enable = true;
+        configFile = "/etc/i3config";
+      };
+      # displayManager.lightdm.enable = true;
+
       # videoDrivers = [ "nvidia" ];
-      # windowManager.i3 = {
-      	# enable = true;
-	# configFile = ./i3-config;
-	# extraPackages = with pkgs; [
-          # dmenu #application launcher most people use
-          # i3status # gives you the default i3 status bar
-          # i3lock #default i3 screen locker
-          # i3blocks #if you are planning on using i3blocks over i3status
-        # ];        
-      # };
-      displayManager.lightdm.enable = true;
 
       # keyboard stuff
       autoRepeatDelay = 200;
@@ -234,16 +233,33 @@ in {
       prefixLength = 24;
     }];
 
+    programs.zsh.enable = true;
+    programs.zsh.autosuggestions.enable = true;
+    programs.zsh.syntaxHighlighting.enable = true;
+    programs.zsh.ohMyZsh.enable = true;
+    programs.zsh.ohMyZsh.plugins = [ "git" ];
+    programs.zsh.ohMyZsh.theme = "robbyrussell";
+
     # Tell the Nix evaluator to garbage collect more aggressively.
     # This is desirable in memory-constrained environments that don't
     # (yet) have swap set up.
     environment.variables.GC_INITIAL_HEAP_SIZE = "1M";
     environment.systemPackages = with pkgs; [
+      alacritty
       pkgs.xorg.xkbcomp
       pkgs.gitAndTools.gitFull
       tmux
       neovim
     ];
+    
+    environment.sessionVariables = {
+      EDITOR = "nvim";
+      VISUAL = "nvim";
+      BROWSER = "chromium";
+      TERM = "alacritty";
+      TERMINAL = "alacritty";
+    };
+    environment.etc."i3config".text = (import ./pkgs/i3config.nix { inherit pkgs; });
 
     # Make the installer more likely to succeed in low memory
     # environments.  The kernel's overcommit heustistics bite us
