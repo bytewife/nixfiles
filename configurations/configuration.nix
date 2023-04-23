@@ -77,7 +77,7 @@ let
       key <CAPS> { [ Escape, Escape, Escape, Escape ] };
       key <ESC>  { [ Caps_Lock, Caps_Lock, Caps_Lock, Caps_Lock ] };
       key <PRSC> { [ BackSpace, BackSpace, BackSpace, BackSpace ] };
-      };
+    };
   '';
 
 in {
@@ -89,7 +89,7 @@ in {
       # target system.
       "${modulesPath}/installer/scan/detected.nix"
       "${modulesPath}/installer/scan/not-detected.nix"
-      "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
+      #"${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
 
       # Allow "nixos-rebuild" to work properly by providing
       # /etc/nixos/configuration.nix.
@@ -99,15 +99,18 @@ in {
       # the box.
       "${modulesPath}/installer/cd-dvd/channel.nix"
     ];
-
   config = {
-
     virtualisation = { libvirtd = { enable = true; }; };
 
     nix = {
       package = pkgs.nixFlakes;
-      extraOptions = "  experimental-features = nix-command flakes\n";
+      # extraOptions = "  experimental-features = nix-command flakes\n";
     };
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+    nixpkgs.config = {
+  allowUnfree = true;
+};
 
     system.nixos.variant_id = lib.mkDefault "ivy";
 
@@ -224,14 +227,14 @@ in {
 
     networking.networkmanager.enable = true;
     # The default gateway can be found with `ip route show` or `netstat -rn`.
-    networking.defaultGateway = "10.0.0.1";
-    networking.nameservers = [ "8.8.8.8" ];
-    networking.interfaces.wlan0.ipv4.addresses = [{
-      # Note: This address (of course) must be a valid address w.r.t. subnet mask.
-      # Can be found with `ifconfig <interface>`. wlan0 is one such interface.
-      address = "10.0.0.168";
-      prefixLength = 24;
-    }];
+    # networking.defaultGateway = "10.0.0.1";
+    # networking.nameservers = [ "8.8.8.8" ];
+    # networking.interfaces.wlan0.ipv4.addresses = [{
+    #   # Note: This address (of course) must be a valid address w.r.t. subnet mask.
+    #   # Can be found with `ifconfig <interface>`. wlan0 is one such interface.
+    #   address = "10.0.0.168";
+    #   prefixLength = 24;
+    # }];
 
     programs.zsh.enable = true;
     programs.zsh.autosuggestions.enable = true;
@@ -246,12 +249,21 @@ in {
     environment.variables.GC_INITIAL_HEAP_SIZE = "1M";
     environment.systemPackages = with pkgs; [
       alacritty
+      # libsForQt5.dolphin
+      gnome.nautilus
+      magic-wormhole
+      pkgs.firefox
       pkgs.xorg.xkbcomp
+      pkgs.nixfmt
       pkgs.gitAndTools.gitFull
+      util-linux
+      usbutils
       tmux
       neovim
+      xorg.xrandr
     ];
-    
+    hardware.keyboard.qmk.enable = true;
+
     environment.sessionVariables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
@@ -259,11 +271,10 @@ in {
       TERM = "alacritty";
       TERMINAL = "alacritty";
     };
-    environment.etc."i3config".text = (import ../pkgs/i3config.nix { inherit pkgs; });
-    
-    fonts.fonts = with pkgs; [
-      (nerdfonts.override { fonts = [ "Hack" ]; })
-    ];
+    environment.etc."i3config".text =
+      (import ../pkgs/i3config.nix { inherit pkgs; });
+
+    fonts.fonts = with pkgs; [ (nerdfonts.override { fonts = [ "Hack" ]; }) ];
 
     # Make the installer more likely to succeed in low memory
     # environments.  The kernel's overcommit heustistics bite us

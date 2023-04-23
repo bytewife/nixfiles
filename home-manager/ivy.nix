@@ -1,15 +1,16 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 let
-  home = builtins.getEnv "HOME";
+  home = config.home.homeDirectory;
   mod = "Mod4";
 in {
   # Requires dm, which, in my config, is enabled in configuration.nix
   home.username = "ivy";
   home.homeDirectory = "/home/ivy";
-  home.packages = with pkgs; [ chromium tmux ripgrep gitui nixfmt ];
+  home.packages = with pkgs; [ chromium tmux ripgrep gitui nixfmt discord ];
   home.stateVersion = "22.11";
 
-  home.file.".config/alacritty/alacritty.yml".source = ./.config/alacritty/alacritty.yml;
+  home.file.".config/alacritty/alacritty.yml".source =
+    ./.config/alacritty/alacritty.yml;
 
   programs.zoxide.enable = true;
   programs.zoxide.enableZshIntegration = true;
@@ -108,6 +109,6 @@ in {
   };
   services.gnome-keyring.enable = true;
   services.gnome-keyring.components = [ "secrets" "pkcs11" "ssh" ];
-  programs.home-manager.enable = true;
+  #programs.home-manager.enable = true;
 }
 
