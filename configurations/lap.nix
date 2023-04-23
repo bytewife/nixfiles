@@ -39,6 +39,7 @@ services.pipewire = {
 };
 
   environment.systemPackages = with pkgs; [
+     discord
      helvum
      pamixer
      pavucontrol
