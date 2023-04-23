@@ -77,10 +77,18 @@ let
       key <CAPS> { [ Escape, Escape, Escape, Escape ] };
       key <ESC>  { [ Caps_Lock, Caps_Lock, Caps_Lock, Caps_Lock ] };
       key <PRSC> { [ BackSpace, BackSpace, BackSpace, BackSpace ] };
+      key <RALT> { [ Super_R, Super_R, Super_R, Super_R ] };
     };
   '';
 
 in {
+     #key <LALT> { [ Super_L ] };
+     # key <LWIN> { [ Alt_L ] };
+     # key <SPCE> {
+     #     type[Group1] = "EIGHT_LEVEL",
+     #     symbols[Group1] = [ space, underscore ],
+     #     actions[Group1] = [ NoAction(), RedirectKey(key=<UNDS>, clearmods=Shift) ]
+     # };
   #imports = [
   #        "${modulesPath}/profiles/ivy.nix"
   #];
@@ -123,6 +131,7 @@ in {
     # Use less privileged ivy user
     users.users.ivy = {
       isNormalUser = true;
+      shell = pkgs.zsh;
       extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
@@ -240,7 +249,7 @@ in {
     programs.zsh.autosuggestions.enable = true;
     programs.zsh.syntaxHighlighting.enable = true;
     programs.zsh.ohMyZsh.enable = true;
-    programs.zsh.ohMyZsh.plugins = [ "autojump" "git" ];
+    programs.zsh.ohMyZsh.plugins = [ "git" ];
     programs.zsh.ohMyZsh.theme = "robbyrussell";
 
     # Tell the Nix evaluator to garbage collect more aggressively.
@@ -254,6 +263,7 @@ in {
       gnome.nautilus
       magic-wormhole
       pkgs.firefox
+      pkgs.google-chrome
       pkgs.xorg.xkbcomp
       pkgs.nixfmt
       pkgs.gitAndTools.gitFull
@@ -264,12 +274,15 @@ in {
       xorg.xrandr
       zoxide
     ];
+    programs.neovim.vimAlias = true;
+
+
     hardware.keyboard.qmk.enable = true;
 
     environment.sessionVariables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
-      BROWSER = "chromium";
+      BROWSER = "google-chrome-stable";
       TERM = "alacritty";
       TERMINAL = "alacritty";
     };
