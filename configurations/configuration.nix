@@ -249,6 +249,7 @@ in {
     environment.variables.GC_INITIAL_HEAP_SIZE = "1M";
     environment.systemPackages = with pkgs; [
       alacritty
+      atuin
       # libsForQt5.dolphin
       gnome.nautilus
       magic-wormhole
@@ -261,6 +262,7 @@ in {
       tmux
       neovim
       xorg.xrandr
+      zoxide
     ];
     hardware.keyboard.qmk.enable = true;
 
