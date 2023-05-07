@@ -39,12 +39,16 @@ services.pipewire = {
 };
 
   environment.systemPackages = with pkgs; [
+     pkgs.google-chrome
      discord
      helvum
      pamixer
      pavucontrol
      qmk
   ];
+    environment.sessionVariables = {
+	BROWSER = "google-chrome-stable";
+    };
 
     networking.interfaces.wlan0.ipv4.addresses = [{
 	# Note: This address (of course) must be a valid address w.r.t. subnet mask.
