@@ -10,7 +10,41 @@ let
     xkb_keycodes  { include "evdev+aliases(qwerty)"  };
   '';
   rnst_types = pkgs.writeText "rnst_types" ''
-    xkb_types     { include "complete"	};
+    default xkb_types "addsuper" {
+       include "complete"
+
+       type "TEST_THING" {
+           modifiers= Shift+LevelThree;
+           map[Shift]= Level2;
+           map[LevelThree]= Level3;
+           map[Shift+LevelThree]= Level4;
+           level_name[Level1]= "Base";
+           level_name[Level2]= "Shift";
+           level_name[Level3]= "Alt Base";
+           level_name[Level4]= "Shift Alt";
+       };
+
+      // type "FOUR_LEVEL_SEMIALPHABETIC_SUPER" {
+      //       modifiers= Shift+Lock+LevelThree+Mod4;
+      //       map[Shift]= Level2;
+      //       map[Lock]= Level2;
+      //       map[LevelThree]= Level3;
+      //       map[Lock+LevelThree]= Level3;
+      //       map[Shift+LevelThree]= Level4;
+      //       map[Shift+Lock+LevelThree]= Level4;
+      //       map[Mod4]= Level5;
+      //       map[Shift+Mod4]= Level5;
+      //       map[Lock+Mod4]= Level5;
+      //       map[Shift+Lock+Mod4]= Level5;
+      //       preserve[Lock+LevelThree]= Lock;
+      //       preserve[Shift+Lock+LevelThree]= Lock;
+      //       level_name[Level1]= "Base";
+      //       level_name[Level2]= "Shift";
+      //       level_name[Level3]= "Alt Base";
+      //       level_name[Level4]= "Shift Alt";
+      //       level_name[Level5]= "With Super";
+      //  };
+    };
   '';
   rnst_compat = pkgs.writeText "rnst_compat" ''
     xkb_compat    { include "complete"	};
@@ -20,7 +54,7 @@ let
   '';
   rnst_symbols = pkgs.writeText "rnst_symbols" ''
     xkb_symbols   {
-      include "pc+us(dvp)+inet(evdev)"
+      include "pc+us(dvp)+inet(evdev)+addsuper"
 
       key <TLDE> { [dead_grave, dead_tilde,         grave,       asciitilde ] };
       key <AE01> { [         1,     exclam,    exclamdown,      onesuperior ] };
@@ -63,7 +97,12 @@ let
 
       key <AB01> { [         m,          M,            ae,               AE ] };
       key <AB02> { [         b,          B,             x,                X ] };
-      key <AB03> { [         f,          F,     copyright,             cent ] };
+      //key <AB03> { [         f,          F,     copyright,             cent ] };
+      replace key <AB03> {
+      	  type[Group1] = "TEST_THING",
+          symbols[Group1] = [ f, F, f, F, G ],
+          actions[Group1] = [ NoAction(), NoAction(), NoAction(), NoAction() ]//, RedirectKey(key=<LatV>,mods=Control,clearmods=Super) ]
+      };
       key <AB04> { [         g,          G,             v,                V ] };
       key <AB05> { [         j,          J,             b,                B ] };
       key <AB06> { [         q,          Q,        ntilde,           Ntilde ] };
@@ -82,17 +121,16 @@ let
       key <RALT> { [ Super_R, Super_R, Super_R, Super_R ] };
       key <LALT> { [ Super_L, Super_L, Super_L, Super_L ] };
       key <LWIN> { [ Alt_L, Alt_L, Alt_L, Alt_L ] };
+      // Shift+space to output underscore
+      key <SPCE> {
+          type[Group1] = "EIGHT_LEVEL",
+          symbols[Group1] = [ space, underscore, space, space ],
+          actions[Group1] = [ NoAction(), RedirectKey(key=<UNDS>, clearmods=Shift) ]
+      };
     };
   '';
 
 in {
-     #key <LALT> { [ Super_L ] };
-     # key <LWIN> { [ Alt_L ] };
-     # key <SPCE> {
-     #     type[Group1] = "EIGHT_LEVEL",
-     #     symbols[Group1] = [ space, underscore ],
-     #     actions[Group1] = [ NoAction(), RedirectKey(key=<UNDS>, clearmods=Shift) ]
-     # };
   #imports = [
   #        "${modulesPath}/profiles/ivy.nix"
   #];
@@ -267,7 +305,6 @@ in {
       gnome.nautilus
       magic-wormhole
       pkgs.firefox
-      pkgs.google-chrome
       pkgs.xorg.xkbcomp
       pkgs.nixfmt
       pkgs.gitAndTools.gitFull
@@ -279,7 +316,6 @@ in {
       zoxide
     ];
     programs.neovim.vimAlias = true;
-
 
     hardware.keyboard.qmk.enable = true;
 

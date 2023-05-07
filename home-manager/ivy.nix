@@ -6,7 +6,7 @@ in {
   # Requires dm, which, in my config, is enabled in configuration.nix
   home.username = "ivy";
   home.homeDirectory = "/home/ivy";
-  home.packages = with pkgs; [ chromium tmux ripgrep gitui nixfmt ];
+  home.packages = with pkgs; [ pkgs.google-chrome tmux ripgrep gitui nixfmt ];
   home.stateVersion = "22.11";
 
   home.file.".config/alacritty/alacritty.yml".source =
