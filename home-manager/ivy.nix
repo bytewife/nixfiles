@@ -20,6 +20,7 @@ in {
       plugins = with pkgs.vimPlugins; [ vim-surround ];
       enable = true;
       extraConfig = ''
+        set clipboard+=unnamedplus
         nnoremap a j
         vnoremap a j
         noremap e k

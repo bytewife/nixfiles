@@ -1,4 +1,6 @@
 # Provide a basic configuration for installation devices like CDs.
+# todo
+# dmenu shortcut, vim plugins, keys like ctrl-a, fix audio pipewire, format and clean up code
 { config, pkgs, lib, modulesPath, ... }:
 
 with lib;
@@ -78,6 +80,8 @@ let
       key <ESC>  { [ Caps_Lock, Caps_Lock, Caps_Lock, Caps_Lock ] };
       key <PRSC> { [ BackSpace, BackSpace, BackSpace, BackSpace ] };
       key <RALT> { [ Super_R, Super_R, Super_R, Super_R ] };
+      key <LALT> { [ Super_L, Super_L, Super_L, Super_L ] };
+      key <LWIN> { [ Alt_L, Alt_L, Alt_L, Alt_L ] };
     };
   '';
 
