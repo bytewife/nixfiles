@@ -10,41 +10,7 @@ let
     xkb_keycodes  { include "evdev+aliases(qwerty)"  };
   '';
   rnst_types = pkgs.writeText "rnst_types" ''
-    default xkb_types "addsuper" {
-       include "complete"
-
-       type "TEST_THING" {
-           modifiers= Shift+LevelThree;
-           map[Shift]= Level2;
-           map[LevelThree]= Level3;
-           map[Shift+LevelThree]= Level4;
-           level_name[Level1]= "Base";
-           level_name[Level2]= "Shift";
-           level_name[Level3]= "Alt Base";
-           level_name[Level4]= "Shift Alt";
-       };
-
-      // type "FOUR_LEVEL_SEMIALPHABETIC_SUPER" {
-      //       modifiers= Shift+Lock+LevelThree+Mod4;
-      //       map[Shift]= Level2;
-      //       map[Lock]= Level2;
-      //       map[LevelThree]= Level3;
-      //       map[Lock+LevelThree]= Level3;
-      //       map[Shift+LevelThree]= Level4;
-      //       map[Shift+Lock+LevelThree]= Level4;
-      //       map[Mod4]= Level5;
-      //       map[Shift+Mod4]= Level5;
-      //       map[Lock+Mod4]= Level5;
-      //       map[Shift+Lock+Mod4]= Level5;
-      //       preserve[Lock+LevelThree]= Lock;
-      //       preserve[Shift+Lock+LevelThree]= Lock;
-      //       level_name[Level1]= "Base";
-      //       level_name[Level2]= "Shift";
-      //       level_name[Level3]= "Alt Base";
-      //       level_name[Level4]= "Shift Alt";
-      //       level_name[Level5]= "With Super";
-      //  };
-    };
+    xkb_types { include "complete" };
   '';
   rnst_compat = pkgs.writeText "rnst_compat" ''
     xkb_compat    { include "complete"	};
@@ -54,7 +20,7 @@ let
   '';
   rnst_symbols = pkgs.writeText "rnst_symbols" ''
     xkb_symbols   {
-      include "pc+us(dvp)+inet(evdev)+addsuper"
+      include "pc+us(dvp)+inet(evdev)"
 
       key <TLDE> { [dead_grave, dead_tilde,         grave,       asciitilde ] };
       key <AE01> { [         1,     exclam,    exclamdown,      onesuperior ] };
@@ -97,12 +63,12 @@ let
 
       key <AB01> { [         m,          M,            ae,               AE ] };
       key <AB02> { [         b,          B,             x,                X ] };
-      //key <AB03> { [         f,          F,     copyright,             cent ] };
-      replace key <AB03> {
-      	  type[Group1] = "TEST_THING",
-          symbols[Group1] = [ f, F, f, F, G ],
-          actions[Group1] = [ NoAction(), NoAction(), NoAction(), NoAction() ]//, RedirectKey(key=<LatV>,mods=Control,clearmods=Super) ]
-      };
+      key <AB03> { [         f,          F,     copyright,             cent ] };
+     //replace key <AB03> {
+     // 	  type[Group1] = "TEST_THING",
+     //     symbols[Group1] = [ f, F, f, F, G ],
+     //     actions[Group1] = [ NoAction(), NoAction(), NoAction(), NoAction() ]//, RedirectKey(key=<LatV>,mods=Control,clearmods=Super) ]
+     // };
       key <AB04> { [         g,          G,             v,                V ] };
       key <AB05> { [         j,          J,             b,                B ] };
       key <AB06> { [         q,          Q,        ntilde,           Ntilde ] };
@@ -121,11 +87,13 @@ let
       key <RALT> { [ Super_R, Super_R, Super_R, Super_R ] };
       key <LALT> { [ Super_L, Super_L, Super_L, Super_L ] };
       key <LWIN> { [ Alt_L, Alt_L, Alt_L, Alt_L ] };
+      //key <SPCE> { [ space, underscore, space, space ] };
       // Shift+space to output underscore
       key <SPCE> {
           type[Group1] = "EIGHT_LEVEL",
+          actions[Group1] = [ NoAction(), RedirectKey(key=<UNDS>, clearmods=Shift) ],
           symbols[Group1] = [ space, underscore, space, space ],
-          actions[Group1] = [ NoAction(), RedirectKey(key=<UNDS>, clearmods=Shift) ]
+	  repeat = yes
       };
     };
   '';
@@ -298,10 +266,45 @@ in {
     # This is desirable in memory-constrained environments that don't
     # (yet) have swap set up.
     environment.variables.GC_INITIAL_HEAP_SIZE = "1M";
+
+
+    # The standard approach to overriding packages is with the followng
+    # approach. Importantly, it will only change the system environment.
+    # Basically, it'll allow you to change the packages that you'd use in your
+    # terminal, but not anything else:
+    # environment.systemPackages = [
+    #  (pkgs.neovim.override { 
+    #  	 configure = {
+    #     customRC = ''
+    #       # Some configuration here...
+    #     '';
+    #    };
+    #  })
+    # ];
+
+    # Another way to perform overrides is by using overlays, which modifies
+    # a package after the previous 'layer'. The main distinction from doing
+    # the typical approach to overrides (`pkgs.<PKG_NAME>.override `) is
+    # replace an existing package system-wide. That means overwriting an
+    # existing package with your own will not only change your system, but can
+    # also change all packages that depend on the original package.
+    # nixpkgs.overlays = [
+    #   (final: prev: {
+    #     my-neovim = prev.neovim.override { 
+    #        configure = {
+    #          customRC = ''
+    #            # Add stuff here.
+    #          '';
+    #       };
+    #     };
+    #   })
+    # ];
+    # Overrides citations:
+    # - https://bobvanderlinden.me/customizing-packages-in-nix/
+
     environment.systemPackages = with pkgs; [
       alacritty
       atuin
-      # libsForQt5.dolphin
       gnome.nautilus
       magic-wormhole
       pkgs.firefox
@@ -311,18 +314,84 @@ in {
       util-linux
       usbutils
       tmux
-      neovim
       xorg.xrandr
       zoxide
+      # Overrides:
+      (pkgs.neovim.override {
+        configure = {
+          customRC = ''
+            nnoremap a j
+            vnoremap a j
+            noremap e k
+            vnoremap e k
+            nnoremap i h
+            vnoremap i h
+            noremap o l
+            vnoremap o l
+            noremap j ;
+            noremap r i
+            noremap , o
+            noremap l e
+            noremap L E
+            noremap H B
+            noremap h b
+            noremap n a
+            noremap N A
+            noremap t w
+            noremap T W
+            noremap w ^
+            noremap ; $
+            noremap m ge
+            noremap M gE
+            noremap b t
+            noremap R I
+            noremap B T
+            noremap x .
+            noremap j n
+            noremap < O
+            noremap Y y$n
+            noremap D d$
+            noremap C c$
+            noremap Q @
+            noremap = .
+            noremap <C-j> J
+            noremap J N
+            noremap P ^
+            noremap <BS> x
+            noremap k <C-D>
+            noremap . <C-U>
+            noremap <tab> >>
+            noremap <S-tab> <<
+            vnoremap <tab> > >gv
+            vnoremap <S-tab> < <gv
+            inoremap <C-p> <Esc>0i<CR>
+            noremap <M-w> 0
+            noremap <M-;> $
+            inoremap <M-w> 0i
+            inoremap <M-;> $a
+            map <M-f> $
+            noremap <M-b> u
+            noremap + .
+            noremap = %
+            noremap _ >
+            noremap - <
+            noremap <C--> <C-x>
+            noremap <C-=> <C-a>
+            noremap <M-,> <C-o>
+            noremap <C-M-,> <C-i>
+          '';
+          packages.myVimPackage = with pkgs.vimPlugins; {
+            start = [ vim-nix vim-surround ];
+          };
+        };
+      })
     ];
-    programs.neovim.vimAlias = true;
 
     hardware.keyboard.qmk.enable = true;
 
     environment.sessionVariables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
-      BROWSER = "google-chrome-stable";
       TERM = "alacritty";
       TERMINAL = "alacritty";
     };
