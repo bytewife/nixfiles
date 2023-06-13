@@ -1,6 +1,6 @@
 # Provide a basic configuration for installation devices like CDs.
 # todo
-# dmenu shortcut, vim plugins, keys like ctrl-a, fix audio pipewire, format and clean up code
+# dmenu shortcut, key repeat and underscores, atuin, keys like ctrl-a, fix audio pipewire, format and clean up code
 { config, pkgs, lib, modulesPath, ... }:
 
 with lib;
@@ -10,7 +10,32 @@ let
     xkb_keycodes  { include "evdev+aliases(qwerty)"  };
   '';
   rnst_types = pkgs.writeText "rnst_types" ''
-    xkb_types { include "complete" };
+    //xkb_types { include "complete" };
+    xkb_types {
+    //default xkb_types "addsuper" {
+       include "complete"
+       type "FOUR_LEVEL_SEMIALPHABETIC_SUPER" {
+             modifiers= Shift+Lock+LevelThree+Mod4;
+             map[Shift]= Level2;
+             map[Lock]= Level2;
+             map[LevelThree]= Level3;
+             map[Lock+LevelThree]= Level3;
+             map[Shift+LevelThree]= Level4;
+             map[Shift+Lock+LevelThree]= Level4;
+             map[Mod4]= Level5;
+             map[Shift+Mod4]= Level5;
+             map[Lock+Mod4]= Level5;
+             map[Shift+Lock+Mod4]= Level5;
+             preserve[Lock+LevelThree]= Lock;
+             preserve[Shift+Lock+LevelThree]= Lock;
+             level_name[Level1]= "Base";
+             level_name[Level2]= "Shift";
+             level_name[Level3]= "Alt Base";
+             level_name[Level4]= "Shift Alt";
+             level_name[Level5]= "With Super";
+       };
+      //};
+    };
   '';
   rnst_compat = pkgs.writeText "rnst_compat" ''
     xkb_compat    { include "complete"	};
@@ -21,6 +46,7 @@ let
   rnst_symbols = pkgs.writeText "rnst_symbols" ''
     xkb_symbols   {
       include "pc+us(dvp)+inet(evdev)"
+      //include "pc+us(dvp)+inet(evdev)+addsuper"
 
       key <TLDE> { [dead_grave, dead_tilde,         grave,       asciitilde ] };
       key <AE01> { [         1,     exclam,    exclamdown,      onesuperior ] };
@@ -64,11 +90,13 @@ let
       key <AB01> { [         m,          M,            ae,               AE ] };
       key <AB02> { [         b,          B,             x,                X ] };
       key <AB03> { [         f,          F,     copyright,             cent ] };
-     //replace key <AB03> {
-     // 	  type[Group1] = "TEST_THING",
-     //     symbols[Group1] = [ f, F, f, F, G ],
-     //     actions[Group1] = [ NoAction(), NoAction(), NoAction(), NoAction() ]//, RedirectKey(key=<LatV>,mods=Control,clearmods=Super) ]
-     // };
+      // Go here to the bindsym solution if this doesn't work https://superuser.com/questions/385748/binding-superc-superv-to-copy-and-paste
+      // replace key <AB03> {
+      //   type[Group1] = "FOUR_LEVEL_SEMIALPHABETIC_SUPER",
+      //   symbols[Group1] = [ f, Right, A, B, C ],
+      //   actions[Group1] = [ NoAction(), RedirectKey(key=<RGHT>,mods=Control,clearmods=Shift), NoAction(), NoAction(), NoAction() ],//RedirectKey(key=<RGHT>,mods=Control,clearmods=Super) ],
+      //   repeat = yes
+      // };
       key <AB04> { [         g,          G,             v,                V ] };
       key <AB05> { [         j,          J,             b,                B ] };
       key <AB06> { [         q,          Q,        ntilde,           Ntilde ] };
@@ -91,8 +119,8 @@ let
       // Shift+space to output underscore
       key <SPCE> {
           type[Group1] = "EIGHT_LEVEL",
-          actions[Group1] = [ NoAction(), RedirectKey(key=<UNDS>, clearmods=Shift) ],
           symbols[Group1] = [ space, underscore, space, space ],
+          actions[Group1] = [ NoAction(), RedirectKey(key=<UNDS>, clearmods=Shift), NoAction(), NoAction() ],
 	  repeat = yes
       };
     };
@@ -127,8 +155,8 @@ in {
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     nixpkgs.config = {
-  allowUnfree = true;
-};
+      allowUnfree = true;
+    };
 
     system.nixos.variant_id = lib.mkDefault "ivy";
 
@@ -145,6 +173,9 @@ in {
       extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
+      packages = with pkgs; [
+        # atuin
+      ];
     };
 
     # Allow the user to log in as root without a password.
@@ -244,6 +275,8 @@ in {
       settings.PermitRootLogin = "yes";
     };
 
+    time.timeZone = "America/Los_Angeles";
+
     networking.networkmanager.enable = true;
     # The default gateway can be found with `ip route show` or `netstat -rn`.
     # networking.defaultGateway = "10.0.0.1";
@@ -261,6 +294,42 @@ in {
     programs.zsh.ohMyZsh.enable = true;
     programs.zsh.ohMyZsh.plugins = [ "git" ];
     programs.zsh.ohMyZsh.theme = "robbyrussell";
+    programs.zsh.interactiveShellInit = ''
+      eval "$(zoxide init zsh)"
+
+      alias j="z"
+
+      alias jpf8888="ssh -NL localhost:8888:localhost:8888 indra"
+      alias jpf8889="ssh -NL localhost:8888:localhost:8889 indra"
+      alias jpf8000="ssh -NL localhost:8000:localhost:8000 indra"
+      alias jn="jupyter notebook"
+
+      alias cac="conda activate"
+      alias crc="conda create"
+      alias cer="conda env remove"
+
+      alias gca="git commit --amend --no-edit"
+      alias gcm="git commit --message"
+      alias gchm='git checkout $(git_main_branch)'
+
+      alias gui="gitui"
+
+      # Add key repeat to spacebar.
+      xset r 65
+
+      unset TMUX
+      alias tsw='tmux switch-client -t'
+      # Show current session
+      alias tcs="tmux display-message -p '#S'"
+      # Kill all other sessions
+      alias tkos="tcs | xargs -n 1 tmux kill-session -a -t"
+      # Run tmux by default.
+      if command -v tmux>/dev/null; then
+        [[ ! $TERM =~ screen ]] && [ -z $TMUX ] && exec tmux
+      fi
+      # Enable programs.
+      eval "$(atuin init zsh)"
+    '';
 
     # Tell the Nix evaluator to garbage collect more aggressively.
     # This is desirable in memory-constrained environments that don't
@@ -302,18 +371,19 @@ in {
     # Overrides citations:
     # - https://bobvanderlinden.me/customizing-packages-in-nix/
 
-    environment.systemPackages = with pkgs; [
+      environment.systemPackages = with pkgs; [
       alacritty
       atuin
+      firefox
+      gitAndTools.gitFull
       gnome.nautilus
       magic-wormhole
-      pkgs.firefox
-      pkgs.xorg.xkbcomp
-      pkgs.nixfmt
-      pkgs.gitAndTools.gitFull
+      nixfmt
+      tmux
       util-linux
       usbutils
-      tmux
+      xdotool
+      xorg.xkbcomp
       xorg.xrandr
       zoxide
       # Overrides:
@@ -381,12 +451,58 @@ in {
             noremap <C-M-,> <C-i>
           '';
           packages.myVimPackage = with pkgs.vimPlugins; {
-            start = [ vim-nix vim-surround ];
+            start = [ vim-nix vim-surround vim-commentary ];
           };
         };
       })
     ];
 
+    programs.tmux = {
+      enable = true;
+      # shortcut = "t";
+      # aggressiveResize = true; -- Disabled to be iTerm-friendly
+      baseIndex = 1;
+      newSession = true;
+      # Stop tmux+escape craziness.
+      escapeTime = 0;
+      # Force tmux to use /tmp for sockets (WSL2 compat)
+      # secureSocket = false;
+      # Run the sensible plugin at the top of the configuration. It is possible to override the sensible settings using the programs.tmux.extraConfig option.
+
+      plugins = with pkgs; [
+        # tmuxPlugins.better-mouse-mode
+        tmuxPlugins.sensible
+      ];
+
+      extraConfig = ''
+        # Enable two prefixes
+        unbind C-b
+        set-option -g prefix C-t
+
+        # Navigation
+        bind-key i select-pane -L
+        bind-key a select-pane -D
+        bind-key e select-pane -U
+        bind-key o select-pane -R
+
+        # Create panes
+        bind-key h split-window -h
+        bind-key v split-window -v
+
+        # Resize
+        bind-key left resize-pane -L 5
+        bind-key down resize-pane -D 5
+        bind-key up resize-pane -U 5
+        bind-key right resize-pane -R 5
+
+        # Kill pane
+        # bind w confirm-before -p "kill-pane #P? (y/n)" kill-pane  
+        bind w kill-pane  
+
+        # Mouse works as expected
+        set -g mouse on;
+      '';
+    };
     hardware.keyboard.qmk.enable = true;
 
     environment.sessionVariables = {
@@ -423,3 +539,4 @@ in {
     networking.firewall.enable = false;
   };
 }
+
