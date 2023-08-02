@@ -146,197 +146,13 @@ in {
       "${modulesPath}/installer/cd-dvd/channel.nix"
     ];
   config = {
-    virtualisation = { libvirtd = { enable = true; }; };
-
-    nix = {
-      package = pkgs.nixFlakes;
-      # extraOptions = "  experimental-features = nix-command flakes\n";
-    };
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-    nixpkgs.config = {
-      allowUnfree = true;
-    };
-
-    system.nixos.variant_id = lib.mkDefault "ivy";
-
     # Enable in installer, even if the minimal profile disables it.
     documentation.enable = mkImageMediaOverride true;
-
     # Show the manual.
     documentation.nixos.enable = mkImageMediaOverride true;
 
-    # Use less privileged ivy user
-    users.users.ivy = {
-      isNormalUser = true;
-      shell = pkgs.zsh;
-      extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
-      # Allow the graphical user to login without password
-      initialHashedPassword = "";
-      packages = with pkgs; [
-        # atuin
-      ];
-    };
 
-    # Allow the user to log in as root without a password.
-    users.users.root.initialHashedPassword = "";
-
-    # Allow passwordless sudo from nixos user
-    security.sudo = {
-      enable = mkDefault true;
-      wheelNeedsPassword = mkImageMediaOverride false;
-    };
-
-    # Enable the X11 windowing system.
-    services.xserver = {
-      enable = true;
-
-      # https://discourse.nixos.org/t/unable-to-set-custom-xkb-layout/16534
-      extraLayouts.rnst = {
-        description = "Ivy's keyboard";
-        languages = [ "eng" ];
-        typesFile = rnst_types;
-        symbolsFile = rnst_symbols;
-        keycodesFile = rnst_keycodes;
-        geometryFile = rnst_geometry;
-        compatFile = rnst_compat;
-      };
-      layout = "rnst";
-
-      desktopManager = { xterm.enable = false; };
-
-      # Don't use desktop manager.
-      displayManager.defaultSession = "none+i3";
-
-      windowManager.i3 = {
-        enable = true;
-        configFile = "/etc/i3config";
-      };
-      # displayManager.lightdm.enable = true;
-
-      # videoDrivers = [ "nvidia" ];
-
-      # keyboard stuff
-      autoRepeatDelay = 200;
-      autoRepeatInterval = 25;
-    };
-
-    # Some more help text.
-    services.getty.helpLine = ''
-      meow!!!!!!!!
-
-      The "ivy" and "root" accounts have empty passwords.
-
-      An ssh daemon is running. You then must set a password
-      for either "root" or "ivy" with `passwd` or add an ssh key
-      to /home/ivy/.ssh/authorized_keys be able to login.
-
-      If you need a wireless connection, type
-      `sudo systemctl start wpa_supplicant` and configure a
-      network using `wpa_cli`. See the NixOS manual for details.
-    '' + optionalString config.services.xserver.enable ''
-
-      Type `sudo systemctl start display-manager' to
-      start the graphical user interface.
-    '' + ''
-
-      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓▓▓████████████████████▓▓▓▓▓▓  ▓▓▓▓▓▓██████░░████▓▓▓▓▓▓
-      ▓▓██████▒▒▒▒▒▒▒▒▒▒▓▓▒▒▒▒▒▒▓▓██▓▓▓▓▓▓▓▓▓▓██    ██░░    ██▓▓▓▓
-      ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓██▓▓▓▓▓▓██  ░░  ██░░  ██▓▓▓▓▓▓
-      ██▒▒▒▒▒▒▒▒▒▒▒▒▓▓▒▒▒▒▒▒▒▒▓▓▒▒▒▒██▓▓▓▓▓▓██    ░░    ░░██████▓▓
-      ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▒▒██▓▓▓▓▓▓██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
-      ▓▓██████▒▒▒▒▒▒▒▒▒▒▓▓░░░░░░░░████▓▓▓▓██▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
-      ▓▓▓▓▓▓▓▓████▒▒▒▒▓▓░░░░░░░░░░████▓▓▓▓██░░▒▒▒▒▒▒░░▒▒▒▒▒▒▒▒▒▒██
-      ▓▓▓▓▓▓▓▓▓▓██▓▓▓▓▓▓▓▓░░░░░░██▓▓██▓▓▓▓██░░▒▒░░▒▒▒▒▒▒░░▒▒▒▒░░██
-      ▓▓▓▓▓▓▓▓██▓▓▒▒▒▒▒▒▒▒▒▒▓▓▓▓████▓▓▓▓▓▓▓▓██▒▒▒▒▒▒▒▒▒▒░░░░▒▒██▓▓
-      ▓▓▓▓▓▓▓▓██▒▒▒▒▒▒▒▒▒▒░░░░▒▒▒▒░░██▓▓▓▓▓▓▓▓██▒▒▒▒▒▒▒▒░░▒▒██▓▓▓▓
-        ▓▓▓▓▓▓██▒▒▒▒▓▓▒▒▒▒░░░░▒▒▒▒░░██▓▓▓▓▓▓▓▓▓▓██▒▒▒▒▒▒▒▒██▓▓▓▓▓▓
-      ▓▓▓▓▓▓▓▓██░░▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▓▓▓▓▓▓▓▓▓▓▓▓████████▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓██░░▒▒▒▒▓▓▓▓▒▒▒▒▒▒▒▒▓▓██▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓██░░░░██▓▓▒▒▒▒▓▓▓▓▓▓▒▒██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓▓▓████▓▓██▒▒▒▒▒▒██▒▒▒▒██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓
-      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▒▒░░██▒▒░░██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓████▓▓██████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-      ▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-    '';
-
-    # We run sshd by default. Login via root is only possible after adding a
-    # password via "passwd" or by adding a ssh key to /home/nixos/.ssh/authorized_keys.
-    # The latter one is particular useful if keys are manually added to
-    # installation device for head-less systems i.e. arm boards by manually
-    # mounting the storage in a different system.
-    services.openssh = {
-      enable = true;
-      settings.PermitRootLogin = "yes";
-    };
-
-    time.timeZone = "America/Los_Angeles";
-
-    networking.networkmanager.enable = true;
-    # The default gateway can be found with `ip route show` or `netstat -rn`.
-    # networking.defaultGateway = "10.0.0.1";
-    # networking.nameservers = [ "8.8.8.8" ];
-    # networking.interfaces.wlan0.ipv4.addresses = [{
-    #   # Note: This address (of course) must be a valid address w.r.t. subnet mask.
-    #   # Can be found with `ifconfig <interface>`. wlan0 is one such interface.
-    #   address = "10.0.0.168";
-    #   prefixLength = 24;
-    # }];
-
-    programs.zsh.enable = true;
-    programs.zsh.autosuggestions.enable = true;
-    programs.zsh.syntaxHighlighting.enable = true;
-    programs.zsh.ohMyZsh.enable = true;
-    programs.zsh.ohMyZsh.plugins = [ "git" ];
-    programs.zsh.ohMyZsh.theme = "robbyrussell";
-    programs.zsh.interactiveShellInit = ''
-      # Enable programs.
-      eval "$(zoxide init zsh)"
-      eval "$(atuin init zsh)"
-
-      alias j="z"
-
-      alias jpf8888="ssh -NL localhost:8888:localhost:8888 indra"
-      alias jpf8889="ssh -NL localhost:8888:localhost:8889 indra"
-      alias jpf8000="ssh -NL localhost:8000:localhost:8000 indra"
-      alias jn="jupyter notebook"
-
-      alias cac="conda activate"
-      alias crc="conda create"
-      alias cer="conda env remove"
-
-      alias gca="git commit --amend --no-edit"
-      alias gcm="git commit --message"
-      alias gchm='git checkout $(git_main_branch)'
-
-      alias gui="gitui"
-
-      # Add key repeat to spacebar.
-      xset r 65
-
-      unset TMUX
-      alias tsw='tmux switch-client -t'
-      # Show current session
-      alias tcs="tmux display-message -p '#S'"
-      # Kill all other sessions
-      alias tkos="tcs | xargs -n 1 tmux kill-session -a -t"
-      # Run tmux by default.
-      if command -v tmux>/dev/null; then
-        [[ ! $TERM =~ screen ]] && [ -z $TMUX ] && exec tmux
-      fi
-    '';
-
-    # Tell the Nix evaluator to garbage collect more aggressively.
-    # This is desirable in memory-constrained environments that don't
-    # (yet) have swap set up.
-    environment.variables.GC_INITIAL_HEAP_SIZE = "1M";
-
-
+    environment.etc."i3config".text = (import ../pkgs/i3config.nix { inherit pkgs; });
     # The standard approach to overriding packages is with the followng
     # approach. Importantly, it will only change the system environment.
     # Basically, it'll allow you to change the packages that you'd use in your
@@ -350,7 +166,6 @@ in {
     #    };
     #  })
     # ];
-
     # Another way to perform overrides is by using overlays, which modifies
     # a package after the previous 'layer'. The main distinction from doing
     # the typical approach to overrides (`pkgs.<PKG_NAME>.override `) is
@@ -370,7 +185,6 @@ in {
     # ];
     # Overrides citations:
     # - https://bobvanderlinden.me/customizing-packages-in-nix/
-
     environment.systemPackages = with pkgs; [
       alacritty
       appimage-run
@@ -457,65 +271,176 @@ in {
         };
       })
     ];
-
-    programs.tmux = {
-      enable = true;
-      # shortcut = "t";
-      # aggressiveResize = true; -- Disabled to be iTerm-friendly
-      baseIndex = 1;
-      newSession = true;
-      # Stop tmux+escape craziness.
-      escapeTime = 0;
-      # Force tmux to use /tmp for sockets (WSL2 compat)
-      # secureSocket = false;
-      # Run the sensible plugin at the top of the configuration. It is possible to override the sensible settings using the programs.tmux.extraConfig option.
-
-      plugins = with pkgs; [
-        # tmuxPlugins.better-mouse-mode
-        tmuxPlugins.sensible
-      ];
-
-      extraConfig = ''
-        # Enable two prefixes
-        unbind C-b
-        set-option -g prefix C-t
-
-        # Navigation
-        bind-key i select-pane -L
-        bind-key a select-pane -D
-        bind-key e select-pane -U
-        bind-key o select-pane -R
-
-        # Create panes
-        bind-key h split-window -h
-        bind-key v split-window -v
-
-        # Resize
-        bind-key left resize-pane -L 5
-        bind-key down resize-pane -D 5
-        bind-key up resize-pane -U 5
-        bind-key right resize-pane -R 5
-
-        # Kill pane
-        # bind w confirm-before -p "kill-pane #P? (y/n)" kill-pane  
-        bind w kill-pane  
-
-        # Mouse works as expected
-        set -g mouse on;
-      '';
-    };
-    hardware.keyboard.qmk.enable = true;
-
     environment.sessionVariables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
       TERM = "alacritty";
       TERMINAL = "alacritty";
     };
-    environment.etc."i3config".text =
-      (import ../pkgs/i3config.nix { inherit pkgs; });
+    # Tell the Nix evaluator to garbage collect more aggressively.
+    # This is desirable in memory-constrained environments that don't
+    # (yet) have swap set up.
+    environment.variables.GC_INITIAL_HEAP_SIZE = "1M";
+
 
     fonts.fonts = with pkgs; [ (nerdfonts.override { fonts = [ "Hack" ]; }) ];
+
+
+    hardware.keyboard.qmk.enable = true;
+
+
+    # The default gateway can be found with `ip route show` or `netstat -rn`.
+    # networking.defaultGateway = "10.0.0.1";
+    # networking.nameservers = [ "8.8.8.8" ];
+    # networking.interfaces.wlan0.ipv4.addresses = [{
+    #   # Note: This address (of course) must be a valid address w.r.t. subnet mask.
+    #   # Can be found with `ifconfig <interface>`. wlan0 is one such interface.
+    #   address = "10.0.0.168";
+    #   prefixLength = 24;
+    # }];
+    networking.firewall.enable = false;
+    networking.networkmanager.enable = true;
+
+
+    nix.package = pkgs.nixFlakes;
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+
+    nixpkgs.config.allowUnfree = true;
+
+
+    programs.zsh.enable = true;
+    programs.zsh.autosuggestions.enable = true;
+    programs.zsh.interactiveShellInit = ''
+      # Enable programs.
+      eval "$(zoxide init zsh)"
+      eval "$(atuin init zsh)"
+
+      alias j="z"
+
+      alias jpf8888="ssh -NL localhost:8888:localhost:8888 indra"
+      alias jpf8889="ssh -NL localhost:8888:localhost:8889 indra"
+      alias jpf8000="ssh -NL localhost:8000:localhost:8000 indra"
+      alias jn="jupyter notebook"
+
+      alias cac="conda activate"
+      alias crc="conda create"
+      alias cer="conda env remove"
+
+      alias gca="git commit --amend --no-edit"
+      alias gcm="git commit --message"
+      alias gchm='git checkout $(git_main_branch)'
+
+      alias gui="gitui"
+
+      # Add key repeat to spacebar.
+      xset r 65
+
+      unset TMUX
+      alias tsw='tmux switch-client -t'
+      # Show current session
+      alias tcs="tmux display-message -p '#S'"
+      # Kill all other sessions
+      alias tkos="tcs | xargs -n 1 tmux kill-session -a -t"
+      # Run tmux by default.
+      if command -v tmux>/dev/null; then
+        [[ ! $TERM =~ screen ]] && [ -z $TMUX ] && exec tmux
+      fi
+    '';
+    programs.zsh.ohMyZsh.enable = true;
+    programs.zsh.ohMyZsh.plugins = [ "git" ];
+    programs.zsh.ohMyZsh.theme = "robbyrussell";
+    programs.zsh.syntaxHighlighting.enable = true;
+    programs.tmux.enable = true;
+    # programs.tmux.aggressiveResize = true; -- Disabled to be iTerm-friendly
+    programs.tmux.baseIndex = 1;
+    # Stop tmux+escape craziness.
+    programs.tmux.escapeTime = 0;
+    programs.tmux.extraConfig = ''
+      # Enable two prefixes
+      unbind C-b
+      set-option -g prefix C-t
+
+      # Navigation
+      bind-key i select-pane -L
+      bind-key a select-pane -D
+      bind-key e select-pane -U
+      bind-key o select-pane -R
+
+      # Create panes
+      bind-key h split-window -h
+      bind-key v split-window -v
+
+      # Resize
+      bind-key left resize-pane -L 5
+      bind-key down resize-pane -D 5
+      bind-key up resize-pane -U 5
+      bind-key right resize-pane -R 5
+
+      # Kill pane
+      # bind w confirm-before -p "kill-pane #P? (y/n)" kill-pane  
+      bind w kill-pane  
+
+      # Mouse works as expected
+      set -g mouse on;
+    '';
+    # Run the sensible plugin at the top of the configuration. It is possible to override the sensible settings using the programs.tmux.extraConfig option.
+    programs.tmux.plugins = with pkgs; [
+      # tmuxPlugins.better-mouse-mode
+      tmuxPlugins.sensible
+    ];
+    programs.tmux.newSession = true;
+    # Force tmux to use /tmp for sockets (WSL2 compat)
+    # programs.tmux.secureSocket = false;
+
+
+    # Allow passwordless sudo from nixos user
+    security.sudo = {
+      enable = mkDefault true;
+      wheelNeedsPassword = mkImageMediaOverride false;
+    };
+
+
+    # We run sshd by default. Login via root is only possible after adding a
+    # password via "passwd" or by adding a ssh key to /home/nixos/.ssh/authorized_keys.
+    # The latter one is particular useful if keys are manually added to
+    # installation device for head-less systems i.e. arm boards by manually
+    # mounting the storage in a different system.
+    services.openssh.enable = true; 
+    services.openssh.settings.PermitRootLogin = "yes";
+    services.getty.helpLine = ''
+      meow!!!!!!!!
+      - The "ivy" and "root" accounts have empty passwords.
+      - An ssh daemon is running. You then must set a password
+      for either "root" or "ivy" with `passwd` or add an ssh key
+      to /home/ivy/.ssh/authorized_keys be able to login.
+      - If you need a wireless connection, type
+      `sudo systemctl start wpa_supplicant` and configure a
+      network using `wpa_cli`. See the NixOS manual for details.
+    '' + optionalString config.services.xserver.enable ''
+      - Type `sudo systemctl start display-manager' to
+      start the graphical user interface.
+    '';
+    services.xserver.autoRepeatDelay = 200;
+    services.xserver.autoRepeatInterval = 25;
+    services.xserver.enable = true;
+    # https://discourse.nixos.org/t/unable-to-set-custom-xkb-layout/16534
+    services.xserver.extraLayouts.rnst = {
+      description = "Ivy's keyboard";
+      languages = [ "eng" ];
+      typesFile = rnst_types;
+      symbolsFile = rnst_symbols;
+      keycodesFile = rnst_keycodes;
+      geometryFile = rnst_geometry;
+      compatFile = rnst_compat;
+    };
+    # Don't use desktop manager.
+    services.xserver.displayManager.defaultSession = "none+i3";
+    services.xserver.desktopManager.xterm.enable = false;
+    services.xserver.layout = "rnst";
+    services.xserver.windowManager.i3.enable = true;
+    services.xserver.windowManager.i3.configFile = "/etc/i3config";
+
 
     # Make the installer more likely to succeed in low memory
     # environments.  The kernel's overcommit heustistics bite us
@@ -524,9 +449,9 @@ in {
     # plenty of free memory.
     # boot.kernel.sysctl."vm.overcommit_memory" = "1";
 
-    # To speed up installation a little bit, include the complete
-    # stdenv in the Nix store on the CD.
     system.extraDependencies = with pkgs; [
+      # To speed up installation a little bit, include the complete
+      # stdenv in the Nix store on the CD.
       stdenv
       stdenvNoCC # for runCommand
       # busybox
@@ -535,9 +460,38 @@ in {
       systemdStage1
       systemdStage1Network
     ];
+    system.nixos.variant_id = lib.mkDefault "ivy";
     system.stateVersion = "22.11";
 
-    networking.firewall.enable = false;
+    # Use less privileged ivy user
+    users.users.astral = {
+      isNormalUser = true;
+      shell = pkgs.zsh;
+      extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
+      # Allow the graphical user to login without password
+      initialHashedPassword = "";
+      # packages = with pkgs; [
+      # ];
+    };
+    users.users.ivy = {
+      isNormalUser = true;
+      shell = pkgs.zsh;
+      extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
+      # Allow the graphical user to login without password
+      initialHashedPassword = "";
+      packages = with pkgs; [
+        # atuin
+      ];
+    };
+
+
+    time.timeZone = "America/Los_Angeles";
+
+
+    # Allow the user to log in as root without a password.
+    users.users.root.initialHashedPassword = "";
+
+
+    virtualisation = { libvirtd = { enable = true; }; };
   };
 }
-
