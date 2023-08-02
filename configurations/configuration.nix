@@ -1,6 +1,6 @@
 # Provide a basic configuration for installation devices like CDs.
-# todo
-# atuin, keys like ctrl-a, fix audio pipewire, fix audio keys, format and clean up code
+# Todo
+# keys like ctrl-a, fix audio pipewire, fix audio keys
 { config, pkgs, lib, modulesPath, ... }:
 
 with lib;
@@ -127,25 +127,28 @@ let
   '';
 
 in {
-  #imports = [
-  #        "${modulesPath}/profiles/ivy.nix"
-  #];
   imports =
     [ # Enable devices which are usually scanned, because we don't know the
       # target system.
       "${modulesPath}/installer/scan/detected.nix"
       "${modulesPath}/installer/scan/not-detected.nix"
       #"${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
-
       # Allow "nixos-rebuild" to work properly by providing
       # /etc/nixos/configuration.nix.
       "${modulesPath}/profiles/clone-config.nix"
-
       # Include a copy of Nixpkgs so that nixos-install works out of
       # the box.
       "${modulesPath}/installer/cd-dvd/channel.nix"
     ];
   config = {
+    # Make the installer more likely to succeed in low memory
+    # environments. The kernel's overcommit heustistics bite us
+    # fairly often, preventing processes such as nix-worker or
+    # download-using-manifests.pl from forking even if there is
+    # plenty of free memory.
+    boot.kernel.sysctl."vm.overcommit_memory" = "1";
+
+
     # Enable in installer, even if the minimal profile disables it.
     documentation.enable = mkImageMediaOverride true;
     # Show the manual.
@@ -153,130 +156,13 @@ in {
 
 
     environment.etc."i3config".text = (import ../pkgs/i3config.nix { inherit pkgs; });
-    # The standard approach to overriding packages is with the followng
-    # approach. Importantly, it will only change the system environment.
-    # Basically, it'll allow you to change the packages that you'd use in your
-    # terminal, but not anything else:
-    # environment.systemPackages = [
-    #  (pkgs.neovim.override { 
-    #  	 configure = {
-    #     customRC = ''
-    #       # Some configuration here...
-    #     '';
-    #    };
-    #  })
-    # ];
-    # Another way to perform overrides is by using overlays, which modifies
-    # a package after the previous 'layer'. The main distinction from doing
-    # the typical approach to overrides (`pkgs.<PKG_NAME>.override `) is
-    # replace an existing package system-wide. That means overwriting an
-    # existing package with your own will not only change your system, but can
-    # also change all packages that depend on the original package.
-    # nixpkgs.overlays = [
-    #   (final: prev: {
-    #     my-neovim = prev.neovim.override { 
-    #        configure = {
-    #          customRC = ''
-    #            # Add stuff here.
-    #          '';
-    #       };
-    #     };
-    #   })
-    # ];
-    # Overrides citations:
-    # - https://bobvanderlinden.me/customizing-packages-in-nix/
     environment.systemPackages = with pkgs; [
-      alacritty
       appimage-run
-      atuin
-      firefox
-      gitAndTools.gitFull
-      gnome.nautilus
-      magic-wormhole
+      git
       nixfmt
-      tmux
       util-linux
-      usbutils
       xdotool
-      xorg.xkbcomp
-      xorg.xrandr
-      zoxide
-      # Overrides:
-      (pkgs.neovim.override {
-        configure = {
-          customRC = ''
-            nnoremap a j
-            vnoremap a j
-            noremap e k
-            vnoremap e k
-            nnoremap i h
-            vnoremap i h
-            noremap o l
-            vnoremap o l
-            noremap j ;
-            noremap r i
-            noremap , o
-            noremap l e
-            noremap L E
-            noremap H B
-            noremap h b
-            noremap n a
-            noremap N A
-            noremap t w
-            noremap T W
-            noremap w ^
-            noremap ; $
-            noremap m ge
-            noremap M gE
-            noremap b t
-            noremap R I
-            noremap B T
-            noremap x .
-            noremap j n
-            noremap < O
-            noremap Y y$n
-            noremap D d$
-            noremap C c$
-            noremap Q @
-            noremap = .
-            noremap <C-j> J
-            noremap J N
-            noremap P ^
-            noremap <BS> x
-            noremap k <C-D>
-            noremap . <C-U>
-            noremap <tab> >>
-            noremap <S-tab> <<
-            vnoremap <tab> > >gv
-            vnoremap <S-tab> < <gv
-            inoremap <C-p> <Esc>0i<CR>
-            noremap <M-w> 0
-            noremap <M-;> $
-            inoremap <M-w> 0i
-            inoremap <M-;> $a
-            map <M-f> $
-            noremap <M-b> u
-            noremap + .
-            noremap = %
-            noremap _ >
-            noremap - <
-            noremap <C--> <C-x>
-            noremap <C-=> <C-a>
-            noremap <M-,> <C-o>
-            noremap <C-M-,> <C-i>
-          '';
-          packages.myVimPackage = with pkgs.vimPlugins; {
-            start = [ vim-nix vim-surround vim-commentary ];
-          };
-        };
-      })
     ];
-    environment.sessionVariables = {
-      EDITOR = "nvim";
-      VISUAL = "nvim";
-      TERM = "alacritty";
-      TERMINAL = "alacritty";
-    };
     # Tell the Nix evaluator to garbage collect more aggressively.
     # This is desirable in memory-constrained environments that don't
     # (yet) have swap set up.
@@ -309,89 +195,8 @@ in {
     nixpkgs.config.allowUnfree = true;
 
 
-    programs.zsh.enable = true;
-    programs.zsh.autosuggestions.enable = true;
-    programs.zsh.interactiveShellInit = ''
-      # Enable programs.
-      eval "$(zoxide init zsh)"
-      eval "$(atuin init zsh)"
-
-      alias j="z"
-
-      alias jpf8888="ssh -NL localhost:8888:localhost:8888 indra"
-      alias jpf8889="ssh -NL localhost:8888:localhost:8889 indra"
-      alias jpf8000="ssh -NL localhost:8000:localhost:8000 indra"
-      alias jn="jupyter notebook"
-
-      alias cac="conda activate"
-      alias crc="conda create"
-      alias cer="conda env remove"
-
-      alias gca="git commit --amend --no-edit"
-      alias gcm="git commit --message"
-      alias gchm='git checkout $(git_main_branch)'
-
-      alias gui="gitui"
-
-      # Add key repeat to spacebar.
-      xset r 65
-
-      unset TMUX
-      alias tsw='tmux switch-client -t'
-      # Show current session
-      alias tcs="tmux display-message -p '#S'"
-      # Kill all other sessions
-      alias tkos="tcs | xargs -n 1 tmux kill-session -a -t"
-      # Run tmux by default.
-      if command -v tmux>/dev/null; then
-        [[ ! $TERM =~ screen ]] && [ -z $TMUX ] && exec tmux
-      fi
-    '';
-    programs.zsh.ohMyZsh.enable = true;
-    programs.zsh.ohMyZsh.plugins = [ "git" ];
-    programs.zsh.ohMyZsh.theme = "robbyrussell";
-    programs.zsh.syntaxHighlighting.enable = true;
-    programs.tmux.enable = true;
-    # programs.tmux.aggressiveResize = true; -- Disabled to be iTerm-friendly
-    programs.tmux.baseIndex = 1;
-    # Stop tmux+escape craziness.
-    programs.tmux.escapeTime = 0;
-    programs.tmux.extraConfig = ''
-      # Enable two prefixes
-      unbind C-b
-      set-option -g prefix C-t
-
-      # Navigation
-      bind-key i select-pane -L
-      bind-key a select-pane -D
-      bind-key e select-pane -U
-      bind-key o select-pane -R
-
-      # Create panes
-      bind-key h split-window -h
-      bind-key v split-window -v
-
-      # Resize
-      bind-key left resize-pane -L 5
-      bind-key down resize-pane -D 5
-      bind-key up resize-pane -U 5
-      bind-key right resize-pane -R 5
-
-      # Kill pane
-      # bind w confirm-before -p "kill-pane #P? (y/n)" kill-pane  
-      bind w kill-pane  
-
-      # Mouse works as expected
-      set -g mouse on;
-    '';
-    # Run the sensible plugin at the top of the configuration. It is possible to override the sensible settings using the programs.tmux.extraConfig option.
-    programs.tmux.plugins = with pkgs; [
-      # tmuxPlugins.better-mouse-mode
-      tmuxPlugins.sensible
-    ];
-    programs.tmux.newSession = true;
-    # Force tmux to use /tmp for sockets (WSL2 compat)
-    # programs.tmux.secureSocket = false;
+    # Allow VSCode to work.
+    programs.nix-ld.enable = true;
 
 
     # Allow passwordless sudo from nixos user
@@ -409,7 +214,7 @@ in {
     services.openssh.enable = true; 
     services.openssh.settings.PermitRootLogin = "yes";
     services.getty.helpLine = ''
-      meow!!!!!!!!
+      Mreow! This this is the helpful reset kitty. Here's some tips:
       - The "ivy" and "root" accounts have empty passwords.
       - An ssh daemon is running. You then must set a password
       for either "root" or "ivy" with `passwd` or add an ssh key
@@ -426,7 +231,7 @@ in {
     services.xserver.enable = true;
     # https://discourse.nixos.org/t/unable-to-set-custom-xkb-layout/16534
     services.xserver.extraLayouts.rnst = {
-      description = "Ivy's keyboard";
+      description = "Ivy's RNST Keyboard";
       languages = [ "eng" ];
       typesFile = rnst_types;
       symbolsFile = rnst_symbols;
@@ -435,19 +240,12 @@ in {
       compatFile = rnst_compat;
     };
     # Don't use desktop manager.
+    # TODO move this to user-specific file.
     services.xserver.displayManager.defaultSession = "none+i3";
     services.xserver.desktopManager.xterm.enable = false;
-    services.xserver.layout = "rnst";
     services.xserver.windowManager.i3.enable = true;
     services.xserver.windowManager.i3.configFile = "/etc/i3config";
 
-
-    # Make the installer more likely to succeed in low memory
-    # environments.  The kernel's overcommit heustistics bite us
-    # fairly often, preventing processes such as nix-worker or
-    # download-using-manifests.pl from forking even if there is
-    # plenty of free memory.
-    # boot.kernel.sysctl."vm.overcommit_memory" = "1";
 
     system.extraDependencies = with pkgs; [
       # To speed up installation a little bit, include the complete
@@ -463,15 +261,12 @@ in {
     system.nixos.variant_id = lib.mkDefault "ivy";
     system.stateVersion = "22.11";
 
-    # Use less privileged ivy user
+
     users.users.astral = {
       isNormalUser = true;
       shell = pkgs.zsh;
       extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
-      # Allow the graphical user to login without password
       initialHashedPassword = "";
-      # packages = with pkgs; [
-      # ];
     };
     users.users.ivy = {
       isNormalUser = true;
@@ -479,19 +274,15 @@ in {
       extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
-      packages = with pkgs; [
-        # atuin
-      ];
     };
+    # Allow the user to log in as root without a password.
+    users.users.root.initialHashedPassword = "";
 
 
     time.timeZone = "America/Los_Angeles";
 
 
-    # Allow the user to log in as root without a password.
-    users.users.root.initialHashedPassword = "";
-
-
     virtualisation = { libvirtd = { enable = true; }; };
   };
 }
+
