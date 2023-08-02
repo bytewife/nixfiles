@@ -1,6 +1,6 @@
 # Provide a basic configuration for installation devices like CDs.
 # todo
-# dmenu shortcut, key repeat and underscores, atuin, keys like ctrl-a, fix audio pipewire, format and clean up code
+# atuin, keys like ctrl-a, fix audio pipewire, fix audio keys, format and clean up code
 { config, pkgs, lib, modulesPath, ... }:
 
 with lib;
@@ -295,7 +295,9 @@ in {
     programs.zsh.ohMyZsh.plugins = [ "git" ];
     programs.zsh.ohMyZsh.theme = "robbyrussell";
     programs.zsh.interactiveShellInit = ''
+      # Enable programs.
       eval "$(zoxide init zsh)"
+      eval "$(atuin init zsh)"
 
       alias j="z"
 
@@ -327,8 +329,6 @@ in {
       if command -v tmux>/dev/null; then
         [[ ! $TERM =~ screen ]] && [ -z $TMUX ] && exec tmux
       fi
-      # Enable programs.
-      eval "$(atuin init zsh)"
     '';
 
     # Tell the Nix evaluator to garbage collect more aggressively.
@@ -371,8 +371,9 @@ in {
     # Overrides citations:
     # - https://bobvanderlinden.me/customizing-packages-in-nix/
 
-      environment.systemPackages = with pkgs; [
+    environment.systemPackages = with pkgs; [
       alacritty
+      appimage-run
       atuin
       firefox
       gitAndTools.gitFull

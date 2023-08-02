@@ -13,6 +13,10 @@
 
 set $mod Mod4
 
+## TESTING
+bindsym --release Mod4+c exec --no-startup-id xdotool key --clearmodifiers Ctrl+Insert
+##
+
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 font pango:monospace 8
