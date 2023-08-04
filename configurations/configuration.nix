@@ -1,6 +1,7 @@
 # Provide a basic configuration for installation devices like CDs.
 # Todo
-# keys like ctrl-a, fix audio pipewire, fix audio keys
+# - user: keys like ctrl-a, fix audio pipewire, fix audio keys
+# - server: admin, access from anywhere, LEDs
 { config, pkgs, lib, modulesPath, ... }:
 
 with lib;
@@ -262,6 +263,11 @@ in {
     system.stateVersion = "22.11";
 
 
+    users.users.admin = {
+      isNormalUser = true;
+      extraGroups = [ "wheel" ];
+      initialHashedPassword = "";
+    };
     users.users.astral = {
       isNormalUser = true;
       shell = pkgs.zsh;

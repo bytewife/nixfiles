@@ -24,6 +24,8 @@
           #_module.args = {inherit inputs;};
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+          home-manager.users.admin = import ./home-manager/admin.nix;
+          home-manager.users.astral = import ./home-manager/astral.nix;
           home-manager.users.ivy = import ./home-manager/ivy.nix;
         }
 
