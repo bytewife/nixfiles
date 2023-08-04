@@ -1,7 +1,7 @@
 # Provide a basic configuration for installation devices like CDs.
 # Todo
 # - user: keys like ctrl-a, fix audio pipewire, fix audio keys
-# - server: admin, access from anywhere, LEDs
+# - server: access from anywhere, LEDs
 { config, pkgs, lib, modulesPath, ... }:
 
 with lib;
@@ -214,6 +214,10 @@ in {
     # mounting the storage in a different system.
     services.openssh.enable = true; 
     services.openssh.settings.PermitRootLogin = "yes";
+    # Require public key authentication for better security. 
+    # Make sure to Add keys to `users.users.<name>.openssh.authorizedKeys.keys`.
+    services.openssh.settings.PasswordAuthentication = false;
+    services.openssh.settings.KbdInteractiveAuthentication = false;
     services.getty.helpLine = ''
       Mreow! This this is the helpful reset kitty. Here's some tips:
       - The "ivy" and "root" accounts have empty passwords.
@@ -271,7 +275,7 @@ in {
     users.users.astral = {
       isNormalUser = true;
       shell = pkgs.zsh;
-      extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
+      extraGroups = [ "networkmanager" "video" "libvirtd" ];
       initialHashedPassword = "";
     };
     users.users.ivy = {
@@ -280,6 +284,9 @@ in {
       extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
+      openssh.authorizedKeys.keys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDaxeB3jhzGEnIf5Tv1YVqhcPi2eUMtCfYys4fytAFbxyGd/mZBD0ch29bIXstmG9Lus0qPCS7oFH1uo2b5VDw+Ygy8/PBAUFhds7mX3LEvJr3XACCLVi2y2BaCKmGqGPpW7K61sqKExVLv63U2OREUZeT7i4RTarYu3L05TcYj101TVb4R9WRnPe3mmbB66l89jcTRYPHznk0UA8JzkPzFqmywiFbAMjMuzv2QjiLYOlxypknr84zMU/U4qaLbYWdlsDo8p47/oAGUl3ATG2HdYN0vOLGb7bNYYyvLL4NtUcsovufIEBQnLWjwggksw07cnMbko1jTwdZX52DO+HCPCEMaqs0NdyI0sXfxpSVqYL4aR6SvWVZH65sxx5OYKMuwvGutYSn3s3fwGFWtrVqiBonGWuUHdP5f9zUoG16syG+XiwYXkYHdio2TuuwtgmlrRaHrtMLxSzzhfiZhSyQzIdJBiIFOknGxY6AooyeGm5dJr/1IXEmlltVHdR0ACKM= ivy"
+      ];
     };
     # Allow the user to log in as root without a password.
     users.users.root.initialHashedPassword = "";
