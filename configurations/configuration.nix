@@ -2,6 +2,7 @@
 # Todo
 # - user: keys like ctrl-a, fix audio pipewire, fix audio keys
 # - server: access from anywhere, LEDs
+# set up wireguard, fai12ban, dynamic dns. wireguard uses its own port, so i may need to add it to the allowedports. after that you should be good!~
 { config, pkgs, lib, modulesPath, ... }:
 
 with lib;
@@ -128,19 +129,19 @@ let
   '';
 
 in {
-  imports =
-    [ # Enable devices which are usually scanned, because we don't know the
-      # target system.
-      "${modulesPath}/installer/scan/detected.nix"
-      "${modulesPath}/installer/scan/not-detected.nix"
-      #"${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
-      # Allow "nixos-rebuild" to work properly by providing
-      # /etc/nixos/configuration.nix.
-      "${modulesPath}/profiles/clone-config.nix"
-      # Include a copy of Nixpkgs so that nixos-install works out of
-      # the box.
-      "${modulesPath}/installer/cd-dvd/channel.nix"
-    ];
+  imports = [ 
+    # Enable devices which are usually scanned, because we don't know the
+    # target system.
+    "${modulesPath}/installer/scan/detected.nix"
+    "${modulesPath}/installer/scan/not-detected.nix"
+    #"${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
+    # Allow "nixos-rebuild" to work properly by providing
+    # /etc/nixos/configuration.nix.
+    "${modulesPath}/profiles/clone-config.nix"
+    # Include a copy of Nixpkgs so that nixos-install works out of
+    # the box.
+    "${modulesPath}/installer/cd-dvd/channel.nix"
+  ];
   config = {
     # Make the installer more likely to succeed in low memory
     # environments. The kernel's overcommit heustistics bite us
@@ -275,7 +276,7 @@ in {
     users.users.astral = {
       isNormalUser = true;
       shell = pkgs.zsh;
-      extraGroups = [ "networkmanager" "video" "libvirtd" ];
+      extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
       initialHashedPassword = "";
     };
     users.users.ivy = {
@@ -284,6 +285,7 @@ in {
       extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
       # Allow the graphical user to login without password
       initialHashedPassword = "";
+      # Should add multiple keys for redundancy.
       openssh.authorizedKeys.keys = [
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDaxeB3jhzGEnIf5Tv1YVqhcPi2eUMtCfYys4fytAFbxyGd/mZBD0ch29bIXstmG9Lus0qPCS7oFH1uo2b5VDw+Ygy8/PBAUFhds7mX3LEvJr3XACCLVi2y2BaCKmGqGPpW7K61sqKExVLv63U2OREUZeT7i4RTarYu3L05TcYj101TVb4R9WRnPe3mmbB66l89jcTRYPHznk0UA8JzkPzFqmywiFbAMjMuzv2QjiLYOlxypknr84zMU/U4qaLbYWdlsDo8p47/oAGUl3ATG2HdYN0vOLGb7bNYYyvLL4NtUcsovufIEBQnLWjwggksw07cnMbko1jTwdZX52DO+HCPCEMaqs0NdyI0sXfxpSVqYL4aR6SvWVZH65sxx5OYKMuwvGutYSn3s3fwGFWtrVqiBonGWuUHdP5f9zUoG16syG+XiwYXkYHdio2TuuwtgmlrRaHrtMLxSzzhfiZhSyQzIdJBiIFOknGxY6AooyeGm5dJr/1IXEmlltVHdR0ACKM= ivy"
       ];
