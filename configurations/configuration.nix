@@ -186,7 +186,6 @@ in {
     #   address = "10.0.0.168";
     #   prefixLength = 24;
     # }];
-    networking.firewall.enable = false;
     networking.networkmanager.enable = true;
 
 

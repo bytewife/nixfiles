@@ -50,6 +50,7 @@ services.pipewire = {
 	BROWSER = "google-chrome-stable";
     };
 
+    networking.firewall.enable = false;
     networking.hostName = "lap";
     networking.defaultGateway = "10.0.0.1";
     networking.interfaces.wlan0.ipv4.addresses = [{
