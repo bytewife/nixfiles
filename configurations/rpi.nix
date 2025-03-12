@@ -1,7 +1,9 @@
 { pkgs, modulesPath, ... }:
 let 
   externalInterface = "wlan0";
-  ipv4Address = "10.0.0.169";
+  # externalInterface = "en0";
+  # ipv4Address = "10.0.0.169";
+  ipv4Address = "192.168.1.169";
 in {
   imports = [
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
@@ -14,11 +16,11 @@ in {
     address = ipv4Address;
     prefixLength = 24;
   }];
-  networking.firewall.enable = true;
+  networking.firewall.enable = false;
   networking.firewall.allowedTCPPorts = [ 80 22 ];
 
   networking.firewall.extraCommands = "iptables -t nat -A POSTROUTING -d ${ipv4Address} -p tcp -m tcp --dport 80 -j MASQUERADE";
-  networking.nat.enable = true;
+  networking.nat.enable = false;
   networking.nat.externalInterface = externalInterface;
   networking.nat.internalInterfaces = [ "wg0" ];
   # Make sure you configure your router to portforward:
@@ -42,6 +44,7 @@ in {
     }
   ];
   networking.firewall.allowedUDPPorts = [ 51820 ];
+  networking.wireguard.enable = false;
   networking.wireguard.interfaces = {
     wg0 = {
       # This is the Wireguard Tunnel CIDR Range.
