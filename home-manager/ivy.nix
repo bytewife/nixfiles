@@ -27,17 +27,16 @@ in {
   };
   home.stateVersion = "22.11";
 
-
   programs.atuin.enable = true;
   programs.atuin.enableZshIntegration = true;
   programs.git.enable = true;
   programs.git.extraConfig.credential.helper = "store --file ~/.git-credentials";
-  programs.git.extraConfig.github.user = "ivyraine";
+  programs.git.extraConfig.github.user = "bytewife";
   programs.git.extraConfig.rerere.enabled = true;
   programs.git.extraConfig.init.defaultBranch = "main";
   programs.git.package = pkgs.gitFull;
-  programs.git.userName = "Ivy Raine";
-  programs.git.userEmail = "ivyemberraine@gmail.com";
+  programs.git.userName = "Ivy Evergreen";
+  programs.git.userEmail = "bytewife@gmail.com";
   programs.password-store = {
     enable = true;
     package =
@@ -112,34 +111,7 @@ in {
   programs.tmux.baseIndex = 1;
   # Stop tmux+escape craziness.
   programs.tmux.escapeTime = 0;
-  programs.tmux.extraConfig = ''
-    # Enable two prefixes
-    unbind C-b
-    set-option -g prefix C-t
-
-    # Navigation
-    bind-key i select-pane -L
-    bind-key a select-pane -D
-    bind-key e select-pane -U
-    bind-key o select-pane -R
-
-    # Create panes
-    bind-key h split-window -h
-    bind-key v split-window -v
-
-    # Resize
-    bind-key left resize-pane -L 5
-    bind-key down resize-pane -D 5
-    bind-key up resize-pane -U 5
-    bind-key right resize-pane -R 5
-
-    # Kill pane
-    # bind w confirm-before -p "kill-pane #P? (y/n)" kill-pane  
-    bind w kill-pane  
-
-    # Mouse works as expected
-    set -g mouse on;
-  '';
+  programs.tmux.extraConfig = builtins.readFile .config/tmux/.tmux.conf;
   # Run the sensible plugin at the top of the configuration. It is possible to override the sensible settings using the programs.tmux.extraConfig option.
   programs.tmux.plugins = with pkgs; [
     # tmuxPlugins.better-mouse-mode

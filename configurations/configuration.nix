@@ -161,6 +161,7 @@ in {
     environment.systemPackages = with pkgs; [
       appimage-run
       git
+      gh
       nixfmt
       util-linux
       xdotool
@@ -286,7 +287,10 @@ in {
       initialHashedPassword = "";
       # Should add multiple keys for redundancy.
       openssh.authorizedKeys.keys = [
+      	# Machine: ivy777-pink
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDaxeB3jhzGEnIf5Tv1YVqhcPi2eUMtCfYys4fytAFbxyGd/mZBD0ch29bIXstmG9Lus0qPCS7oFH1uo2b5VDw+Ygy8/PBAUFhds7mX3LEvJr3XACCLVi2y2BaCKmGqGPpW7K61sqKExVLv63U2OREUZeT7i4RTarYu3L05TcYj101TVb4R9WRnPe3mmbB66l89jcTRYPHznk0UA8JzkPzFqmywiFbAMjMuzv2QjiLYOlxypknr84zMU/U4qaLbYWdlsDo8p47/oAGUl3ATG2HdYN0vOLGb7bNYYyvLL4NtUcsovufIEBQnLWjwggksw07cnMbko1jTwdZX52DO+HCPCEMaqs0NdyI0sXfxpSVqYL4aR6SvWVZH65sxx5OYKMuwvGutYSn3s3fwGFWtrVqiBonGWuUHdP5f9zUoG16syG+XiwYXkYHdio2TuuwtgmlrRaHrtMLxSzzhfiZhSyQzIdJBiIFOknGxY6AooyeGm5dJr/1IXEmlltVHdR0ACKM= ivy"
+	# Machine: F4U57
+	"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCxDWA2E5jSe30S14MlLWmFGBuMufe/hqYNdOnYDY+1qOz7XNtRfYtyFrxDlMCPDGMOTg5VwFMKBHEniG2kbkf8ytg3jvOqjgnludic/7gr7C7KLl8NqNyS6KhVcbqAnNk/EeJnQy5EAv3JxfH/7TR+nRqyGvTVBy592ys9NSePZWGWDm2KfnFc+ekp2bISyaWUWE4o3TxWdks890Xj9+JN9HweMYnNtcfHIExeNwmAMeAQe6uKCB4WSPa1U1pEkICbUTs5VpDIoeDwnAQK9v3cpd+1Y/hHj2U+cCa5gTxOgfKhJlMGxVWpJ9HomT+9G8RPh3BJIPvh29rWd8vdNAI5tl/LhbwdZg9hy3qhVF+l6d+yXCZ73HMs3Gz/zSS42zImI6sDHLdW47w13izmedyRwrfrCAThbPFN5qPKoYh8XRmZgNoGIFK0K5Z74a9Js+kTvYSmcbWP+HbfC5cAml14QYXY9pqu+OOSXzZZKJ6Eloe4eGUMqNaKzVb/xLysRMjJjFb/vefC4UQNpenxCJnveSuQsteu+cMpXOWciQ2ixOL2ieZxQ3/OVQTvC/AwJaF0f1GAcQxwUZRZKdvQ9aPCyC23geH1RwuJayCY+qGWZxPpsKghCZGrY37fnRlaMXai61eTG+CZbETfuRkBIUk9ZDe2kA5lBFvwraXyKQR34Q== airanman@stanford.edu"
       ];
     };
     # Allow the user to log in as root without a password.

@@ -4,6 +4,7 @@ let
   # externalInterface = "en0";
   # ipv4Address = "10.0.0.169";
   ipv4Address = "192.168.1.169";
+  wireguardCidr = "10.1.0.0/24";
 in {
   imports = [
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
@@ -16,15 +17,16 @@ in {
     address = ipv4Address;
     prefixLength = 24;
   }];
-  networking.firewall.enable = false;
+  networking.firewall.enable = true;
   networking.firewall.allowedTCPPorts = [ 80 22 ];
+  networking.firewall.allowedUDPPorts = [ 51820 ];
 
-  networking.firewall.extraCommands = "iptables -t nat -A POSTROUTING -d ${ipv4Address} -p tcp -m tcp --dport 80 -j MASQUERADE";
-  networking.nat.enable = false;
+  # networking.firewall.extraCommands = "iptables -t nat -A POSTROUTING -d ${ipv4Address} -p tcp -m tcp --dport 80 -j MASQUERADE";
+  networking.nat.enable = true;
   networking.nat.externalInterface = externalInterface;
   networking.nat.internalInterfaces = [ "wg0" ];
   # Make sure you configure your router to portforward:
-  # - 80, 20 (TCP)
+  # - 80, 22 (TCP)
   # - 51820 (UDP)
   networking.nat.forwardPorts = [
     {
@@ -43,22 +45,21 @@ in {
       destination = "${ipv4Address}:51820";
     }
   ];
-  networking.firewall.allowedUDPPorts = [ 51820 ];
-  networking.wireguard.enable = false;
+  networking.wireguard.enable = true;
   networking.wireguard.interfaces = {
     wg0 = {
       # This is the Wireguard Tunnel CIDR Range.
       # Choose a range that is not used on your local network!
-      # Here we use "10.1.0.0/24" because our LAN uses "x.x.x.0/x".
+      # Here we use "10.1.0.1/24" because our LAN uses "x.x.x.0/x".
       ips = [ "10.1.0.0/24" ];
       listenPort = 51820;
       postSetup = ''
-        ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.1.0.0/24 -o eth0 -j MASQUERADE
+        ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.1.0.0/24 -o ${externalInterface} -j MASQUERADE
       '';
 
       # This undoes the above command
       postShutdown = ''
-        ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.1.0.0/24 -o eth0 -j MASQUERADE
+        ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.1.0.0/24 -o ${externalInterface} -j MASQUERADE
       '';
 
       # First you must manually generate a private key using:
@@ -92,16 +93,24 @@ in {
           # Endpoint = 76.126.31.35:51820
           # PersistentKeepalive = 25
         }
-        # { # Astral
-        #   publicKey = "{john doe's public key}";
-        #   allowedIPs = [ "10.1.0.3/32" ];
-        # }
+	{
+          # Machine: F4U57
+          publicKey = "xu/B0zLuaqxBCbCBJOzrZIiEmDh9GIkHvdvE28Nhxn0=";
+          allowedIPs = [ "10.1.0.3/32" ];
+	}
       ];
     };
   };
 ####
 
   services = {
+    fail2ban = {
+      enable = true;
+      maxretry = 3;
+      # bantime = "168h";
+    };
+    # NixOS comes with a default sshd jail; for it to work well, services.openssh.logLevel should be set to "VERBOSE" or higher so that fail2ban can observe failed login attempts. This module sets it to "VERBOSE" if not set otherwise, so enabling fail2ban can make SSH logs more verbose.
+    openssh.settings.logLevel = "VERBOSE";
     syncthing = {
       configDir = "/home/ivy/.config/syncthing";
       dataDir = "/home/ivy/";
@@ -111,6 +120,7 @@ in {
       openDefaultPorts = true;
       devices = {
         "ivy777" = { id = "L6F6DXN-3I6SUMU-QE27QUE-GI67GOI-DNWOSWF-JLDAKMK-PMQ57VG-2SQ4HAM"; };
+	"F4U57" = { id = "QRMDYTT-NPEQCZL-FJCYP7V-P6H4DCF-3LYZLLR-QGBVUXU-PJFFNMT-QMBH7QT"; };
       };
       folders = {
         # This is the name of the folder in Syncthing, as well as the folder ID.
@@ -120,6 +130,15 @@ in {
           devices = [ "ivy777" ];
           versioning.type = "simple";
           versioning.params.keep = "10";
+        };
+        "Music (tagged)" = {
+          # This is the folder to Sync from this device.
+          path = "/home/ivy/Music/tagged/";
+          devices = [ "F4U57" ];
+	  # See https://docs.syncthing.net/users/versioning.html
+          versioning.type = "simple";
+          versioning.params.keep = "3";
+          versioning.params.cleanupIntervals = "86400";
         };
       };
     };
