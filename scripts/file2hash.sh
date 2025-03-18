@@ -14,6 +14,7 @@ set -x
 originalPath=$(realpath "$1")
 filename=$(basename "$1" | sed 's| |_|g')
 extension=$(echo "$filename" | awk -F. '{print $NF}')
+filename=$(basename "${filename}" ".${extension}")
 # Note: Set this prefix in nix config
 hashDir="$2"
 contentHash=$(sha256sum "$originalPath" | awk '{print $1}')
